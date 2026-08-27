@@ -1,0 +1,150 @@
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="shuai-ob-wx-offi-plugin：将 Obsidian 当前笔记一键复制成微信公众号富文本">
+</p>
+
+# shuai-ob-wx-offi-plugin
+
+一个面向微信公众号写作者的 Obsidian 插件。打开 Markdown 笔记，点击一次按钮，即可复制带内联样式的富文本，并在主编辑区查看公众号排版预览。
+
+插件完全在本地运行，不会上传笔记内容。
+
+## 功能
+
+- 一键复制当前 Markdown 笔记全文。
+- 同时写入 `text/html` 和 `text/plain`，可直接粘贴到微信公众号编辑器。
+- 在主编辑区打开分栏预览，不占用 Obsidian 侧边栏。
+- 编辑笔记时，预览自动更新。
+- 自动忽略文件开头的 YAML Properties。
+- 原始 HTML 会被转义，避免在预览中直接执行。
+- 提供左侧 Ribbon 按钮和命令面板命令。
+
+## 支持的 Markdown
+
+| 类型 | 支持情况 |
+| --- | --- |
+| H1–H6 标题 | 支持 |
+| 段落与换行 | 支持 |
+| 粗体与斜体 | 支持 |
+| 有序、无序列表 | 支持 |
+| 引用 | 支持 |
+| 行内代码、代码块 | 支持 |
+| 链接 | 支持 |
+| 标准 Markdown 网络图片 | 支持 |
+| 表格、分隔线 | 支持 |
+| Obsidian `![[本地图片]]` | 暂不支持自动上传 |
+
+## 安装
+
+插件尚未进入 Obsidian Community Plugins，需要手动安装。
+
+### 从源码构建
+
+需要 Node.js 18 或更高版本。
+
+```bash
+git clone git@github.com:qizong007/shuai-ob-wx-offi-plugin.git
+cd shuai-ob-wx-offi-plugin
+npm install
+npm run build
+```
+
+构建完成后，在 Obsidian 仓库中创建插件目录：
+
+```text
+<你的仓库>/.obsidian/plugins/shuai-ob-wx-offi-plugin/
+```
+
+把以下三个文件复制进去：
+
+```text
+main.js
+manifest.json
+styles.css
+```
+
+重启 Obsidian，在「设置 → 第三方插件」中启用「帅 · 公众号格式助手」。
+
+## 使用
+
+1. 在 Obsidian 中打开一篇 Markdown 笔记。
+2. 点击左侧 Ribbon 中间带“帅”字的公众号图标。
+3. 插件会复制当前笔记，并在主编辑区打开分栏预览。
+4. 进入微信公众号编辑器，直接粘贴。
+
+预览顶部的「复制公众号格式」按钮可以再次复制当前笔记。
+
+## 命令
+
+在 Obsidian 命令面板中可以使用：
+
+- `复制当前笔记为公众号格式`
+- `打开公众号预览`
+
+## 工作原理
+
+```text
+当前 Markdown 笔记
+        ↓
+解析 Markdown 并生成内联样式 HTML
+        ↓
+主编辑区实时预览
+        ↓
+以 HTML + 纯文本写入系统剪贴板
+```
+
+公众号编辑器通常会过滤外部 CSS，因此插件把排版样式直接写到 HTML 元素的 `style` 属性中。复制前还会移除阴影、圆角、滤镜和过渡等兼容性较差的样式。
+
+## 本地开发
+
+```bash
+npm install
+npm test
+npm run build
+```
+
+- `npm test`：运行格式转换单元测试。
+- `npm run build`：执行 TypeScript 类型检查并生成生产版 `main.js`。
+- `npm run dev`：监听源码变化并持续构建。
+
+项目结构：
+
+```text
+shuai-ob-wx-offi-plugin/
+├── assets/
+│   ├── plugin-icon.svg
+│   └── readme/hero.svg
+├── src/
+│   ├── formatter.ts
+│   └── main.ts
+├── tests/
+│   └── formatter.test.ts
+├── manifest.json
+├── styles.css
+└── package.json
+```
+
+## 已知限制
+
+- Obsidian 的 WikiLink 和 `![[本地图片]]` 尚未转换为公众号可用的图片资源。
+- 网络图片能否最终进入公众号素材库，取决于公众号编辑器对图片来源的处理。
+- 当前没有针对 Obsidian 移动端做完整实机验证。
+- 微信公众号编辑器可能继续过滤部分 HTML 或样式，最终发布前请检查预览。
+
+## 隐私
+
+插件不发送网络请求，不收集数据，也不保存文章副本。笔记内容只在当前 Obsidian 窗口中转换，并在点击复制时写入系统剪贴板。
+
+## 参与贡献
+
+欢迎提交 Issue 或 Pull Request。提交前请运行：
+
+```bash
+npm test
+npm run build
+```
+
+涉及公众号样式兼容性的修改，请在说明中附上 Obsidian 预览和公众号编辑器粘贴结果。
+
+## License
+
+[MIT](./LICENSE)

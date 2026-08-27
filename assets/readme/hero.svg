@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
+  <title id="title">shuai-ob-wx-offi-plugin</title>
+  <desc id="desc">将 Obsidian 当前笔记一键转换为微信公众号富文本，并在编辑区分栏预览。</desc>
+  <rect width="1200" height="380" rx="28" fill="#0B0F0E"/>
+  <path d="M0 300H1200" stroke="#26312D"/>
+  <g transform="translate(62 58)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+    <text x="0" y="0" fill="#30C78A" font-size="18" font-weight="700" letter-spacing="2">OBSIDIAN PLUGIN · v0.1.0</text>
+    <text x="0" y="66" fill="#F4F7F5" font-size="54" font-weight="760">shuai-ob-wx-offi-plugin</text>
+    <text x="0" y="122" fill="#C8D1CD" font-size="25">把当前 Markdown 笔记，一键复制成公众号富文本。</text>
+    <g transform="translate(0 184)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18">
+      <rect width="148" height="44" rx="10" fill="#17201D" stroke="#35433E"/>
+      <text x="74" y="28" fill="#DDE5E1" text-anchor="middle">本地运行</text>
+      <rect x="162" width="148" height="44" rx="10" fill="#17201D" stroke="#35433E"/>
+      <text x="236" y="28" fill="#DDE5E1" text-anchor="middle">实时预览</text>
+      <rect x="324" width="178" height="44" rx="10" fill="#17201D" stroke="#35433E"/>
+      <text x="413" y="28" fill="#DDE5E1" text-anchor="middle">富文本剪贴板</text>
+    </g>
+  </g>
+  <g transform="translate(760 50)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+    <rect x="0" y="0" width="166" height="224" rx="18" fill="#F4F7F5"/>
+    <path d="M24 44H142M24 76H116M24 108H136M24 140H102" stroke="#84928C" stroke-width="8" stroke-linecap="round"/>
+    <rect x="24" y="172" width="72" height="20" rx="6" fill="#30C78A"/>
+    <text x="24" y="26" fill="#26312D" font-size="15" font-weight="700">NOTE.MD</text>
+    <path d="M187 112H230" stroke="#30C78A" stroke-width="4" stroke-linecap="round"/>
+    <path d="M218 100L230 112 218 124" fill="none" stroke="#30C78A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="252" y="24" width="148" height="200" rx="18" fill="#17201D" stroke="#35433E"/>
+    <rect x="274" y="48" width="104" height="34" rx="6" fill="#30C78A"/>
+    <path d="M274 110H378M274 136H358M274 162H370M274 188H340" stroke="#93A19B" stroke-width="7" stroke-linecap="round"/>
+    <text x="326" y="71" fill="#07100D" font-size="15" font-weight="800" text-anchor="middle">公众号预览</text>
+  </g>
+  <g transform="translate(62 335)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#87958F">
+    <text>MARKDOWN → INLINE HTML → CLIPBOARD</text>
+    <text x="1076" text-anchor="end">MIT</text>
+  </g>
+</svg>
