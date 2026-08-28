@@ -31,6 +31,17 @@ const safeUrl = (value: string, image = false): string => {
 const stripFrontmatter = (markdown: string): string =>
   markdown.replace(/^---\s*\r?\n[\s\S]*?\r?\n---\s*(?:\r?\n|$)/, "");
 
+const FOOTER_SEPARATOR_MARKER = "<!-- shuai-footer-separator -->";
+let footerSeparatorPending = false;
+
+interface LinkReference {
+  label: string;
+  url: string;
+}
+
+const linkReferences: LinkReference[] = [];
+const linkReferenceNumbers = new Map<string, number>();
+
 const renderer = new marked.Renderer();
 
 renderer.heading = (text, level) => {
@@ -72,8 +83,19 @@ renderer.listitem = (text) =>
 
 renderer.link = (href, title, text) => {
   const url = safeUrl(href ?? "");
-  const titleAttribute = title ? ` title="${escapeHtml(title)}"` : "";
-  return `<a href="${url}"${titleAttribute} style="color: #555; text-decoration: none; border-bottom: 1px dotted #555; font-weight: 500;">${text}</a>`;
+  if (!url) return text;
+
+  let referenceNumber = linkReferenceNumbers.get(url);
+  if (!referenceNumber) {
+    linkReferences.push({
+      label: text.replace(/<[^>]*>/g, ""),
+      url,
+    });
+    referenceNumber = linkReferences.length;
+    linkReferenceNumbers.set(url, referenceNumber);
+  }
+
+  return `${text}<sup style="color: #666; font-size: 11px; line-height: 1; vertical-align: super;">[${referenceNumber}]</sup>`;
 };
 
 renderer.image = (href, title, text) => {
@@ -83,8 +105,11 @@ renderer.image = (href, title, text) => {
   return `<img src="${url}"${titleAttribute}${altAttribute} style="max-width: 100%; height: auto; border-radius: 8px; margin: 15px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">`;
 };
 
-renderer.hr = () =>
-  '<hr style="border: none; height: 2px; background: linear-gradient(to right, transparent, #666, transparent); margin: 25px 0;">';
+renderer.hr = () => {
+  const margin = footerSeparatorPending ? "42px 0" : "25px 0";
+  footerSeparatorPending = false;
+  return `<hr style="border: none; height: 2px; background: linear-gradient(to right, transparent, #666, transparent); margin: ${margin};">`;
+};
 
 renderer.table = (header, body) =>
   `<table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px;"><thead>${header}</thead><tbody>${body}</tbody></table>`;
@@ -99,7 +124,13 @@ renderer.tablecell = (content, flags) => {
   return `<${type} style="${style}">${content}</${type}>`;
 };
 
-renderer.html = (html) => escapeHtml(html);
+renderer.html = (html) => {
+  if (html.trim() === FOOTER_SEPARATOR_MARKER) {
+    footerSeparatorPending = true;
+    return "";
+  }
+  return escapeHtml(html);
+};
 
 marked.setOptions({
   breaks: true,
@@ -107,8 +138,35 @@ marked.setOptions({
   renderer,
 });
 
-export const formatMarkdownForWechat = (markdown: string): string =>
-  marked.parse(stripFrontmatter(markdown)).trim();
+const renderLinkReferences = (): string => {
+  if (!linkReferences.length) return "";
+
+  const items = linkReferences
+    .map(
+      ({ label, url }, index) =>
+        `<li style="color: #555; font-size: 13px; line-height: 1.7; margin: 10px 0; word-break: break-all;"><span style="font-weight: 600;">[${index + 1}] ${label}</span><br><span style="color: #777;">${url}</span></li>`,
+    )
+    .join("");
+
+  return `<section style="margin-top: 48px; padding-top: 18px; border-top: 1px solid #e0e0e0;"><p style="color: #333; font-size: 14px; font-weight: 600; line-height: 1.6; margin: 0 0 12px 0;">引用源</p><ol style="list-style: none; margin: 0; padding-left: 0;">${items}</ol></section>`;
+};
+
+export const formatMarkdownForWechat = (markdown: string): string => {
+  linkReferences.length = 0;
+  linkReferenceNumbers.clear();
+  footerSeparatorPending = false;
+  const html = marked.parse(stripFrontmatter(markdown)).trim();
+  return `${html}${renderLinkReferences()}`;
+};
+
+export const appendFooterMarkdown = (
+  markdown: string,
+  footerMarkdown: string,
+  enabled: boolean,
+): string => {
+  if (!enabled || !footerMarkdown.trim()) return markdown;
+  return `${markdown.trimEnd()}\n\n\n${FOOTER_SEPARATOR_MARKER}\n\n---\n\n\n${footerMarkdown.trim()}`;
+};
 
 export const optimizeForWechat = (html: string): string =>
   html

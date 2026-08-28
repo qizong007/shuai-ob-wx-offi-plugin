@@ -10,7 +10,12 @@ import {
   WorkspaceLeaf,
 } from "obsidian";
 import WECHAT_COPY_ICON from "../assets/plugin-icon.svg";
-import { formatMarkdownForWechat, optimizeForWechat } from "./formatter";
+import { appendFooterMarkdown, formatMarkdownForWechat, optimizeForWechat } from "./formatter";
+import {
+  DEFAULT_SETTINGS,
+  WechatFormatterSettings,
+  WechatFormatterSettingTab,
+} from "./settings";
 
 const VIEW_TYPE = "wechat-official-account-preview";
 const ICON_ID = "wechat-copy";
@@ -18,6 +23,7 @@ const ICON_ID = "wechat-copy";
 class WechatPreviewView extends ItemView {
   private noteNameEl: HTMLElement | null = null;
   private previewEl: HTMLElement | null = null;
+  private footerToggleButton: HTMLButtonElement | null = null;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -47,7 +53,16 @@ class WechatPreviewView extends ItemView {
     heading.createEl("strong", { text: "公众号预览" });
     this.noteNameEl = heading.createEl("span", { cls: "wechat-formatter-note-name" });
 
-    const copyButton = toolbar.createEl("button", {
+    const actions = toolbar.createDiv({ cls: "wechat-formatter-actions" });
+    this.footerToggleButton = actions.createEl("button", {
+      cls: "wechat-formatter-hook-toggle",
+      text: "结尾钩子",
+    });
+    this.footerToggleButton.addEventListener("click", () => {
+      void this.plugin.setFooterEnabled(!this.plugin.settings.footerEnabled);
+    });
+
+    const copyButton = actions.createEl("button", {
       cls: "mod-cta wechat-formatter-copy",
       text: "复制公众号格式",
     });
@@ -61,6 +76,7 @@ class WechatPreviewView extends ItemView {
     if (!this.previewEl || !this.noteNameEl) return;
 
     this.noteNameEl.setText(file?.basename ?? "未打开 Markdown 笔记");
+    this.updateFooterToggle();
     this.previewEl.empty();
 
     if (!markdown.trim()) {
@@ -71,19 +87,42 @@ class WechatPreviewView extends ItemView {
     }
 
     const content = this.previewEl.createDiv({ cls: "wechat-formatter-content" });
-    content.innerHTML = formatMarkdownForWechat(markdown);
+    content.innerHTML = formatMarkdownForWechat(this.plugin.composeMarkdown(markdown));
     this.previewEl.scrollTop = 0;
+  }
+
+  private updateFooterToggle(): void {
+    if (!this.footerToggleButton) return;
+
+    const configured = this.plugin.hasFooterMarkdown();
+    const enabled = configured && this.plugin.settings.footerEnabled;
+    this.footerToggleButton.disabled = !configured;
+    this.footerToggleButton.setText(
+      configured ? `结尾钩子：${enabled ? "开" : "关"}` : "结尾钩子：未配置",
+    );
+    this.footerToggleButton.classList.toggle("is-active", enabled);
+    this.footerToggleButton.setAttribute(
+      "aria-pressed",
+      enabled ? "true" : "false",
+    );
+    this.footerToggleButton.setAttribute(
+      "title",
+      configured ? "控制预览和复制是否包含结尾钩子" : "请先在插件设置中填写结尾钩子",
+    );
   }
 }
 
 export default class WechatFormatterPlugin extends Plugin {
+  settings!: WechatFormatterSettings;
   private currentMarkdown = "";
   private currentFile: TFile | null = null;
   private refreshTimer: number | null = null;
 
   async onload(): Promise<void> {
+    await this.loadSettings();
     addIcon(ICON_ID, WECHAT_COPY_ICON);
     this.registerView(VIEW_TYPE, (leaf) => new WechatPreviewView(leaf, this));
+    this.addSettingTab(new WechatFormatterSettingTab(this.app, this));
 
     this.addRibbonIcon(ICON_ID, "复制为公众号格式", () => {
       void this.copyCurrentNote(true);
@@ -142,6 +181,37 @@ export default class WechatFormatterPlugin extends Plugin {
     return this.currentFile;
   }
 
+  composeMarkdown(markdown: string): string {
+    return appendFooterMarkdown(
+      markdown,
+      this.settings.footerMarkdown,
+      this.settings.footerEnabled,
+    );
+  }
+
+  hasFooterMarkdown(): boolean {
+    return Boolean(this.settings.footerMarkdown.trim());
+  }
+
+  async setFooterEnabled(enabled: boolean): Promise<void> {
+    this.settings.footerEnabled = enabled;
+    await this.saveSettings();
+    this.refreshViews();
+  }
+
+  async setFooterMarkdown(markdown: string): Promise<void> {
+    this.settings.footerMarkdown = markdown;
+    await this.saveSettings();
+    this.refreshViews();
+  }
+
+  async setPreviewOpenMode(mode: "split" | "tab"): Promise<void> {
+    if (this.settings.previewOpenMode === mode) return;
+    this.settings.previewOpenMode = mode;
+    await this.saveSettings();
+    this.app.workspace.detachLeavesOfType(VIEW_TYPE);
+  }
+
   async copyCurrentNote(openPreview = false): Promise<void> {
     const markdown = this.getCurrentMarkdown();
 
@@ -151,7 +221,7 @@ export default class WechatFormatterPlugin extends Plugin {
       return;
     }
 
-    const html = optimizeForWechat(formatMarkdownForWechat(markdown));
+    const html = optimizeForWechat(formatMarkdownForWechat(this.composeMarkdown(markdown)));
     const plainText = this.htmlToPlainText(html);
 
     try {
@@ -173,7 +243,11 @@ export default class WechatFormatterPlugin extends Plugin {
       if (leaf !== existingLeaf) leaf.detach();
     }
 
-    const leaf = existingLeaf ?? this.app.workspace.getLeaf("split", "vertical");
+    const leaf =
+      existingLeaf ??
+      (this.settings.previewOpenMode === "tab"
+        ? this.app.workspace.getLeaf("tab")
+        : this.app.workspace.getLeaf("split", "vertical"));
 
     if (!existingLeaf) {
       await leaf.setViewState({ type: VIEW_TYPE, active: true });
@@ -231,6 +305,14 @@ export default class WechatFormatterPlugin extends Plugin {
         leaf.view.render(this.currentMarkdown, this.currentFile);
       }
     }
+  }
+
+  private async loadSettings(): Promise<void> {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  private async saveSettings(): Promise<void> {
+    await this.saveData(this.settings);
   }
 
   private htmlToPlainText(html: string): string {

@@ -42,6 +42,57 @@
   white-space: nowrap;
 }
 
+.wechat-formatter-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.wechat-formatter-hook-toggle {
+  white-space: nowrap;
+}
+
+.wechat-formatter-hook-toggle.is-active {
+  color: var(--text-on-accent);
+  background: var(--interactive-accent);
+}
+
+.wechat-formatter-settings-textarea {
+  width: 100%;
+  min-height: 220px;
+  font-family: var(--font-monospace);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.wechat-formatter-footer-setting {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wechat-formatter-footer-setting .setting-item-info,
+.wechat-formatter-footer-setting .setting-item-control {
+  width: 100%;
+}
+
+.wechat-formatter-footer-setting .setting-item-control {
+  justify-content: flex-start;
+}
+
+@media (max-width: 700px) {
+  .wechat-formatter-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wechat-formatter-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
 .wechat-formatter-preview {
   height: calc(100% - 62px);
   overflow: auto;
