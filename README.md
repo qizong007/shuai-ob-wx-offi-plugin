@@ -57,7 +57,7 @@ npm run build
 构建完成后，在 Obsidian 仓库中创建插件目录：
 
 ```text
-<你的仓库>/.obsidian/plugins/shuai-ob-wx-offi-plugin/
+<你的仓库>/.obsidian/plugins/shuai-wechat-formatter/
 ```
 
 把以下三个文件复制进去：
@@ -68,7 +68,7 @@ manifest.json
 styles.css
 ```
 
-重启 Obsidian，在「设置 → 第三方插件」中启用「帅真的公众号格式助手」。
+重启 Obsidian，在「设置 → 第三方插件」中启用「Shuai WeChat Formatter」。插件内部界面仍使用中文。
 
 ## 使用
 
@@ -81,7 +81,7 @@ styles.css
 
 ## 配置结尾钩子
 
-打开「设置 → 帅真的公众号格式助手」，填写一段 Markdown，例如：
+打开「设置 → Shuai WeChat Formatter」，填写一段 Markdown，例如：
 
 ```markdown
 ### 加入我的社群
@@ -103,7 +103,7 @@ styles.css
 
 ## 配置预览打开方式
 
-在「设置 → 帅真的公众号格式助手 → 预览打开方式」中选择：
+在「设置 → Shuai WeChat Formatter → 预览打开方式」中选择：
 
 - `右侧分栏`：在当前笔记右边打开预览。
 - `新标签页`：在当前标签组中新建一个预览标签页。
@@ -119,7 +119,7 @@ styles.css
 
 悬浮窗同时包含结尾钩子开关和「恢复默认」按钮。预览中的调整是临时值，并会直接影响本次复制结果。
 
-在「设置 → 帅真的公众号格式助手」中可以保存默认值。默认行间距为 `1.8`，默认页边距为 `16px`；插件重新加载时会恢复为这两个设置值。
+在「设置 → Shuai WeChat Formatter」中可以保存默认值。默认行间距为 `1.8`，默认页边距为 `16px`；插件重新加载时会恢复为这两个设置值。
 
 ## 链接与引用源
 
