@@ -3,7 +3,7 @@
   "name": "Shuai WeChat Formatter",
   "version": "0.1.0",
   "minAppVersion": "1.5.0",
-  "description": "一键将当前 Markdown 笔记复制为微信公众号富文本，并在侧边栏实时预览。",
+  "description": "Preview and copy Markdown notes as WeChat Official Account rich text.",
   "author": "qizong007",
   "isDesktopOnly": false
 }

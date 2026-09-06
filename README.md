@@ -2,7 +2,13 @@
   <img src="./assets/readme/hero.svg" width="100%" alt="shuai-ob-wx-offi-plugin：将 Obsidian 当前笔记一键复制成微信公众号富文本">
 </p>
 
-# shuai-ob-wx-offi-plugin
+# Shuai WeChat Formatter
+
+Shuai WeChat Formatter is an Obsidian plugin that previews the current Markdown note as WeChat Official Account rich text and copies the formatted result to the clipboard.
+
+Key features include live preview, one-click rich-text copy, configurable footer content, extracted link references, adjustable line height and page margins, and split-pane or tab-based preview modes.
+
+## 中文说明
 
 一个面向微信公众号写作者的 Obsidian 插件。打开 Markdown 笔记，点击一次按钮，即可复制带内联样式的富文本，并在主编辑区查看公众号排版预览。
 
