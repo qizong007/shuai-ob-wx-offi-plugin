@@ -31,7 +31,13 @@ const escapeHtml = (value: string): string =>
 
 const safeUrl = (value: string, image = false): string => {
   const trimmed = value.trim();
-  const normalized = trimmed.replace(/[\u0000-\u001F\u007F\s]+/g, "").toLowerCase();
+  const normalized = Array.from(trimmed)
+    .filter((character) => {
+      const code = character.charCodeAt(0);
+      return code > 31 && code !== 127 && !/\s/.test(character);
+    })
+    .join("")
+    .toLowerCase();
 
   if (normalized.startsWith("javascript:") || normalized.startsWith("vbscript:")) {
     return "";

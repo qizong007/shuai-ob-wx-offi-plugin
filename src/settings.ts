@@ -50,7 +50,6 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
         slider
           .setLimits(1.2, 2.5, 0.1)
           .setValue(this.plugin.settings.defaultLineHeight)
-          .setDynamicTooltip()
           .onChange(async (value) => {
             await this.plugin.setDefaultLineHeight(value);
           }),
@@ -63,7 +62,6 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
         slider
           .setLimits(0, 48, 2)
           .setValue(this.plugin.settings.defaultSidePadding)
-          .setDynamicTooltip()
           .onChange(async (value) => {
             await this.plugin.setDefaultSidePadding(value);
           }),

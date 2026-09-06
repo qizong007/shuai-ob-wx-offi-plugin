@@ -6,6 +6,7 @@ import {
   MarkdownView,
   Notice,
   Plugin,
+  sanitizeHTMLToDom,
   TFile,
   WorkspaceLeaf,
 } from "obsidian";
@@ -139,7 +140,7 @@ class WechatPreviewView extends ItemView {
     }
 
     const content = this.previewEl.createDiv({ cls: "wechat-formatter-content" });
-    content.innerHTML = this.plugin.formatMarkdown(markdown);
+    content.appendChild(sanitizeHTMLToDom(this.plugin.formatMarkdown(markdown)));
   }
 
   private updateFooterToggle(): void {
@@ -230,7 +231,6 @@ export default class WechatFormatterPlugin extends Plugin {
 
   onunload(): void {
     if (this.refreshTimer !== null) window.clearTimeout(this.refreshTimer);
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE);
   }
 
   getCurrentMarkdown(): string {
@@ -415,7 +415,12 @@ export default class WechatFormatterPlugin extends Plugin {
   }
 
   private async loadSettings(): Promise<void> {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const loadedData: unknown = await this.loadData();
+    const loadedSettings =
+      typeof loadedData === "object" && loadedData !== null
+        ? (loadedData as Partial<WechatFormatterSettings>)
+        : {};
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
     this.settings.defaultLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
     this.settings.defaultSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
   }
@@ -425,9 +430,7 @@ export default class WechatFormatterPlugin extends Plugin {
   }
 
   private htmlToPlainText(html: string): string {
-    const element = document.createElement("div");
-    element.innerHTML = html;
-    return element.innerText;
+    return sanitizeHTMLToDom(html).textContent ?? "";
   }
 
   private async writeRichText(html: string, plainText: string): Promise<void> {
@@ -449,7 +452,7 @@ export default class WechatFormatterPlugin extends Plugin {
     }
 
     const clipboardEl = document.body.createDiv({ cls: "wechat-formatter-clipboard" });
-    clipboardEl.innerHTML = html;
+    clipboardEl.appendChild(sanitizeHTMLToDom(html));
     clipboardEl.contentEditable = "true";
     const range = document.createRange();
     range.selectNodeContents(clipboardEl);
