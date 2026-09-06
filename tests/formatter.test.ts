@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   appendFooterMarkdown,
+  DEFAULT_LAYOUT_OPTIONS,
   formatMarkdownForWechat,
+  normalizeLineHeight,
+  normalizeSidePadding,
   optimizeForWechat,
 } from "../src/formatter";
 
@@ -74,4 +77,26 @@ test("reuses one reference number for duplicate links", () => {
 
   assert.equal((html.match(/https:\/\/example.com/g) ?? []).length, 1);
   assert.equal((html.match(/\[1\]<\/sup>/g) ?? []).length, 2);
+});
+
+test("applies adjustable line height and side padding to the output", () => {
+  const html = formatMarkdownForWechat("正文", {
+    lineHeight: 2.1,
+    sidePadding: 28,
+  });
+
+  assert.match(html, /^<section style="line-height: 2.1;/);
+  assert.match(html, /padding-left: 28px; padding-right: 28px;/);
+  assert.match(html, /line-height: inherit/);
+});
+
+test("uses safe layout defaults and clamps invalid values", () => {
+  const html = formatMarkdownForWechat("正文");
+
+  assert.match(html, new RegExp(`line-height: ${DEFAULT_LAYOUT_OPTIONS.lineHeight}`));
+  assert.match(html, new RegExp(`padding-left: ${DEFAULT_LAYOUT_OPTIONS.sidePadding}px`));
+  assert.equal(normalizeLineHeight(9), 2.5);
+  assert.equal(normalizeLineHeight(Number.NaN), 1.8);
+  assert.equal(normalizeSidePadding(-10), 0);
+  assert.equal(normalizeSidePadding(99), 48);
 });

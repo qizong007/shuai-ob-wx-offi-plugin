@@ -1,16 +1,21 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
+import { DEFAULT_LAYOUT_OPTIONS } from "./formatter";
 import type WechatFormatterPlugin from "./main";
 
 export interface WechatFormatterSettings {
   footerEnabled: boolean;
   footerMarkdown: string;
   previewOpenMode: "split" | "tab";
+  defaultLineHeight: number;
+  defaultSidePadding: number;
 }
 
 export const DEFAULT_SETTINGS: WechatFormatterSettings = {
   footerEnabled: false,
   footerMarkdown: "",
   previewOpenMode: "split",
+  defaultLineHeight: DEFAULT_LAYOUT_OPTIONS.lineHeight,
+  defaultSidePadding: DEFAULT_LAYOUT_OPTIONS.sidePadding,
 };
 
 export class WechatFormatterSettingTab extends PluginSettingTab {
@@ -35,6 +40,32 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.previewOpenMode)
           .onChange(async (value) => {
             await this.plugin.setPreviewOpenMode(value === "tab" ? "tab" : "split");
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("默认行间距")
+      .setDesc("预览首次打开时使用的正文行高，可在预览页临时调整。")
+      .addSlider((slider) =>
+        slider
+          .setLimits(1.2, 2.5, 0.1)
+          .setValue(this.plugin.settings.defaultLineHeight)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            await this.plugin.setDefaultLineHeight(value);
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("默认页边距")
+      .setDesc("预览首次打开时使用的左右内边距，单位为 px。")
+      .addSlider((slider) =>
+        slider
+          .setLimits(0, 48, 2)
+          .setValue(this.plugin.settings.defaultSidePadding)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            await this.plugin.setDefaultSidePadding(value);
           }),
       );
 

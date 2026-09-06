@@ -1,5 +1,21 @@
 import { marked } from "marked";
 
+export interface WechatLayoutOptions {
+  lineHeight: number;
+  sidePadding: number;
+}
+
+export const DEFAULT_LAYOUT_OPTIONS: WechatLayoutOptions = {
+  lineHeight: 1.8,
+  sidePadding: 16,
+};
+
+export const normalizeLineHeight = (value: number): number =>
+  Math.round(Math.min(2.5, Math.max(1.2, Number.isFinite(value) ? value : 1.8)) * 10) / 10;
+
+export const normalizeSidePadding = (value: number): number =>
+  Math.round(Math.min(48, Math.max(0, Number.isFinite(value) ? value : 16)));
+
 const escapeHtml = (value: string): string =>
   value.replace(
     /[&<>"']/g,
@@ -58,7 +74,7 @@ renderer.heading = (text, level) => {
 };
 
 renderer.paragraph = (text) =>
-  `<p style="color: #1a1a1a; font-size: 16px; line-height: 1.8; margin: 18px 0;">${text}</p>`;
+  `<p style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 18px 0;">${text}</p>`;
 
 renderer.strong = (text) => `<strong style="color: #333; font-weight: 600;">${text}</strong>`;
 renderer.em = (text) => `<em style="color: #555; font-style: italic; font-weight: 500;">${text}</em>`;
@@ -79,7 +95,7 @@ renderer.list = (body, ordered, start) => {
 };
 
 renderer.listitem = (text) =>
-  `<li style="color: #1a1a1a; font-size: 16px; line-height: 1.8; margin: 8px 0;">${text}</li>`;
+  `<li style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 8px 0;">${text}</li>`;
 
 renderer.link = (href, title, text) => {
   const url = safeUrl(href ?? "");
@@ -144,19 +160,26 @@ const renderLinkReferences = (): string => {
   const items = linkReferences
     .map(
       ({ label, url }, index) =>
-        `<li style="color: #555; font-size: 13px; line-height: 1.7; margin: 10px 0; word-break: break-all;"><span style="font-weight: 600;">[${index + 1}] ${label}</span><br><span style="color: #777;">${url}</span></li>`,
+        `<li style="color: #555; font-size: 13px; line-height: inherit; margin: 10px 0; word-break: break-all;"><span style="font-weight: 600;">[${index + 1}] ${label}</span><br><span style="color: #777;">${url}</span></li>`,
     )
     .join("");
 
   return `<section style="margin-top: 48px; padding-top: 18px; border-top: 1px solid #e0e0e0;"><p style="color: #333; font-size: 14px; font-weight: 600; line-height: 1.6; margin: 0 0 12px 0;">引用源</p><ol style="list-style: none; margin: 0; padding-left: 0;">${items}</ol></section>`;
 };
 
-export const formatMarkdownForWechat = (markdown: string): string => {
+export const formatMarkdownForWechat = (
+  markdown: string,
+  layout: Partial<WechatLayoutOptions> = {},
+): string => {
   linkReferences.length = 0;
   linkReferenceNumbers.clear();
   footerSeparatorPending = false;
   const html = marked.parse(stripFrontmatter(markdown)).trim();
-  return `${html}${renderLinkReferences()}`;
+  const lineHeight = normalizeLineHeight(layout.lineHeight ?? DEFAULT_LAYOUT_OPTIONS.lineHeight);
+  const sidePadding = normalizeSidePadding(
+    layout.sidePadding ?? DEFAULT_LAYOUT_OPTIONS.sidePadding,
+  );
+  return `<section style="line-height: ${lineHeight}; padding-left: ${sidePadding}px; padding-right: ${sidePadding}px;">${html}${renderLinkReferences()}</section>`;
 };
 
 export const appendFooterMarkdown = (

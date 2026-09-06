@@ -1,5 +1,9 @@
 .wechat-formatter-view {
+  display: flex;
+  position: relative;
   height: 100%;
+  flex-direction: column;
+  container-type: inline-size;
   padding: 0 !important;
   background: var(--background-secondary);
 }
@@ -15,6 +19,7 @@
   padding: 12px;
   border-bottom: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
+  flex: none;
 }
 
 .wechat-formatter-heading {
@@ -81,6 +86,67 @@
   justify-content: flex-start;
 }
 
+.wechat-formatter-floating-controls {
+  display: flex;
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 220px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  background: var(--background-primary);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 20%);
+}
+
+.wechat-formatter-floating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+}
+
+.wechat-formatter-floating-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.wechat-formatter-floating-actions button {
+  width: 100%;
+}
+
+.wechat-formatter-range-control {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 48px minmax(60px, 1fr) 40px;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.wechat-formatter-range-control input {
+  width: 100%;
+}
+
+.wechat-formatter-range-control output {
+  color: var(--text-normal);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.wechat-formatter-reset-layout {
+  flex: none;
+  white-space: nowrap;
+}
+
 @media (max-width: 700px) {
   .wechat-formatter-toolbar {
     align-items: flex-start;
@@ -91,20 +157,31 @@
     width: 100%;
     flex-wrap: wrap;
   }
+
 }
 
 .wechat-formatter-preview {
-  height: calc(100% - 62px);
+  min-height: 0;
+  flex: 1;
   overflow: auto;
   padding: 16px;
   background: #f1f1f1;
+}
+
+@container (max-width: 300px) {
+  .wechat-formatter-floating-controls {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+  }
 }
 
 .wechat-formatter-content {
   width: min(100%, 677px);
   min-height: 100%;
   margin: 0 auto;
-  padding: 22px 18px;
+  padding: 22px 0;
   overflow-wrap: anywhere;
   background: white;
   color: #1a1a1a;

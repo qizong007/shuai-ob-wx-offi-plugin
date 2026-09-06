@@ -10,7 +10,13 @@ import {
   WorkspaceLeaf,
 } from "obsidian";
 import WECHAT_COPY_ICON from "../assets/plugin-icon.svg";
-import { appendFooterMarkdown, formatMarkdownForWechat, optimizeForWechat } from "./formatter";
+import {
+  appendFooterMarkdown,
+  formatMarkdownForWechat,
+  normalizeLineHeight,
+  normalizeSidePadding,
+  optimizeForWechat,
+} from "./formatter";
 import {
   DEFAULT_SETTINGS,
   WechatFormatterSettings,
@@ -24,6 +30,10 @@ class WechatPreviewView extends ItemView {
   private noteNameEl: HTMLElement | null = null;
   private previewEl: HTMLElement | null = null;
   private footerToggleButton: HTMLButtonElement | null = null;
+  private lineHeightInput: HTMLInputElement | null = null;
+  private lineHeightValueEl: HTMLElement | null = null;
+  private sidePaddingInput: HTMLInputElement | null = null;
+  private sidePaddingValueEl: HTMLElement | null = null;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -54,7 +64,48 @@ class WechatPreviewView extends ItemView {
     this.noteNameEl = heading.createEl("span", { cls: "wechat-formatter-note-name" });
 
     const actions = toolbar.createDiv({ cls: "wechat-formatter-actions" });
-    this.footerToggleButton = actions.createEl("button", {
+    const copyButton = actions.createEl("button", {
+      cls: "mod-cta wechat-formatter-copy",
+      text: "复制公众号格式",
+    });
+    copyButton.addEventListener("click", () => void this.plugin.copyCurrentNote());
+
+    const floatingControls = this.contentEl.createDiv({
+      cls: "wechat-formatter-floating-controls",
+    });
+    const floatingHeader = floatingControls.createDiv({
+      cls: "wechat-formatter-floating-header",
+    });
+    floatingHeader.createEl("strong", { text: "排版调整" });
+
+    const lineHeightControl = floatingControls.createEl("label", {
+      cls: "wechat-formatter-range-control",
+    });
+    lineHeightControl.createSpan({ text: "行间距" });
+    this.lineHeightInput = lineHeightControl.createEl("input", {
+      attr: { type: "range", min: "1.2", max: "2.5", step: "0.1" },
+    });
+    this.lineHeightInput.addEventListener("input", () => {
+      this.plugin.setPreviewLineHeight(Number(this.lineHeightInput?.value));
+    });
+    this.lineHeightValueEl = lineHeightControl.createEl("output");
+
+    const sidePaddingControl = floatingControls.createEl("label", {
+      cls: "wechat-formatter-range-control",
+    });
+    sidePaddingControl.createSpan({ text: "页边距" });
+    this.sidePaddingInput = sidePaddingControl.createEl("input", {
+      attr: { type: "range", min: "0", max: "48", step: "2" },
+    });
+    this.sidePaddingInput.addEventListener("input", () => {
+      this.plugin.setPreviewSidePadding(Number(this.sidePaddingInput?.value));
+    });
+    this.sidePaddingValueEl = sidePaddingControl.createEl("output");
+
+    const floatingActions = floatingControls.createDiv({
+      cls: "wechat-formatter-floating-actions",
+    });
+    this.footerToggleButton = floatingActions.createEl("button", {
       cls: "wechat-formatter-hook-toggle",
       text: "结尾钩子",
     });
@@ -62,11 +113,11 @@ class WechatPreviewView extends ItemView {
       void this.plugin.setFooterEnabled(!this.plugin.settings.footerEnabled);
     });
 
-    const copyButton = actions.createEl("button", {
-      cls: "mod-cta wechat-formatter-copy",
-      text: "复制公众号格式",
+    const resetButton = floatingActions.createEl("button", {
+      cls: "wechat-formatter-reset-layout",
+      text: "恢复默认",
     });
-    copyButton.addEventListener("click", () => void this.plugin.copyCurrentNote());
+    resetButton.addEventListener("click", () => this.plugin.resetPreviewLayout());
 
     this.previewEl = this.contentEl.createDiv({ cls: "wechat-formatter-preview" });
     this.render(this.plugin.getCurrentMarkdown(), this.plugin.getCurrentFile());
@@ -77,6 +128,7 @@ class WechatPreviewView extends ItemView {
 
     this.noteNameEl.setText(file?.basename ?? "未打开 Markdown 笔记");
     this.updateFooterToggle();
+    this.updateLayoutControls();
     this.previewEl.empty();
 
     if (!markdown.trim()) {
@@ -87,8 +139,7 @@ class WechatPreviewView extends ItemView {
     }
 
     const content = this.previewEl.createDiv({ cls: "wechat-formatter-content" });
-    content.innerHTML = formatMarkdownForWechat(this.plugin.composeMarkdown(markdown));
-    this.previewEl.scrollTop = 0;
+    content.innerHTML = this.plugin.formatMarkdown(markdown);
   }
 
   private updateFooterToggle(): void {
@@ -110,6 +161,16 @@ class WechatPreviewView extends ItemView {
       configured ? "控制预览和复制是否包含结尾钩子" : "请先在插件设置中填写结尾钩子",
     );
   }
+
+  private updateLayoutControls(): void {
+    const lineHeight = this.plugin.getPreviewLineHeight();
+    const sidePadding = this.plugin.getPreviewSidePadding();
+
+    if (this.lineHeightInput) this.lineHeightInput.value = String(lineHeight);
+    if (this.lineHeightValueEl) this.lineHeightValueEl.setText(lineHeight.toFixed(1));
+    if (this.sidePaddingInput) this.sidePaddingInput.value = String(sidePadding);
+    if (this.sidePaddingValueEl) this.sidePaddingValueEl.setText(`${sidePadding}px`);
+  }
 }
 
 export default class WechatFormatterPlugin extends Plugin {
@@ -117,9 +178,12 @@ export default class WechatFormatterPlugin extends Plugin {
   private currentMarkdown = "";
   private currentFile: TFile | null = null;
   private refreshTimer: number | null = null;
+  private previewLineHeight = 1.8;
+  private previewSidePadding = 16;
 
   async onload(): Promise<void> {
     await this.loadSettings();
+    this.resetPreviewLayout(false);
     addIcon(ICON_ID, WECHAT_COPY_ICON);
     this.registerView(VIEW_TYPE, (leaf) => new WechatPreviewView(leaf, this));
     this.addSettingTab(new WechatFormatterSettingTab(this.app, this));
@@ -189,6 +253,49 @@ export default class WechatFormatterPlugin extends Plugin {
     );
   }
 
+  formatMarkdown(markdown: string): string {
+    return formatMarkdownForWechat(this.composeMarkdown(markdown), {
+      lineHeight: this.previewLineHeight,
+      sidePadding: this.previewSidePadding,
+    });
+  }
+
+  getPreviewLineHeight(): number {
+    return this.previewLineHeight;
+  }
+
+  getPreviewSidePadding(): number {
+    return this.previewSidePadding;
+  }
+
+  setPreviewLineHeight(value: number): void {
+    this.previewLineHeight = normalizeLineHeight(value);
+    this.refreshViews();
+  }
+
+  setPreviewSidePadding(value: number): void {
+    this.previewSidePadding = normalizeSidePadding(value);
+    this.refreshViews();
+  }
+
+  resetPreviewLayout(refresh = true): void {
+    this.previewLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
+    this.previewSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
+    if (refresh) this.refreshViews();
+  }
+
+  async setDefaultLineHeight(value: number): Promise<void> {
+    this.settings.defaultLineHeight = normalizeLineHeight(value);
+    await this.saveSettings();
+    this.resetPreviewLayout();
+  }
+
+  async setDefaultSidePadding(value: number): Promise<void> {
+    this.settings.defaultSidePadding = normalizeSidePadding(value);
+    await this.saveSettings();
+    this.resetPreviewLayout();
+  }
+
   hasFooterMarkdown(): boolean {
     return Boolean(this.settings.footerMarkdown.trim());
   }
@@ -221,7 +328,7 @@ export default class WechatFormatterPlugin extends Plugin {
       return;
     }
 
-    const html = optimizeForWechat(formatMarkdownForWechat(this.composeMarkdown(markdown)));
+    const html = optimizeForWechat(this.formatMarkdown(markdown));
     const plainText = this.htmlToPlainText(html);
 
     try {
@@ -309,6 +416,8 @@ export default class WechatFormatterPlugin extends Plugin {
 
   private async loadSettings(): Promise<void> {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings.defaultLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
+    this.settings.defaultSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
   }
 
   private async saveSettings(): Promise<void> {
