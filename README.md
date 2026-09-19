@@ -19,6 +19,7 @@ All formatting happens locally. The plugin does not upload notes, send network r
 - Toggle the footer directly from the floating preview controls.
 - Adjust line height and page margins before copying.
 - Save default line height and page margin values in plugin settings.
+- Choose a body font in plugin settings: editor default, sans-serif, or serif. Code remains monospaced.
 - Convert Markdown links into numbered references at the end of the article.
 - Ignore YAML frontmatter at the beginning of a note.
 - Escape raw HTML and sanitize generated preview content.

@@ -4,6 +4,7 @@ import {
   appendFooterMarkdown,
   DEFAULT_LAYOUT_OPTIONS,
   formatMarkdownForWechat,
+  normalizeFontPreset,
   normalizeLineHeight,
   normalizeSidePadding,
   optimizeForWechat,
@@ -79,6 +80,14 @@ test("reuses one reference number for duplicate links", () => {
   assert.equal((html.match(/\[1\]<\/sup>/g) ?? []).length, 2);
 });
 
+test("inline code keeps paragraph and list text in one inline container", () => {
+  const html = formatMarkdownForWechat("`xxx` 后面接正文。\n\n- `xxx` 后面接列表文字\n  - 嵌套列表");
+
+  assert.match(html, /<p style="[^"]*"><span style="line-height: inherit;">.*<code style=/);
+  assert.match(html, /<li style="[^"]*"><span style="line-height: inherit;">.*<code style=/);
+  assert.match(html, /<\/span>\s*<ul style=/);
+});
+
 test("applies adjustable line height and side padding to the output", () => {
   const html = formatMarkdownForWechat("正文", {
     lineHeight: 2.1,
@@ -99,4 +108,16 @@ test("uses safe layout defaults and clamps invalid values", () => {
   assert.equal(normalizeLineHeight(Number.NaN), 1.8);
   assert.equal(normalizeSidePadding(-10), 0);
   assert.equal(normalizeSidePadding(99), 48);
+});
+
+test("sets a selected body font while keeping code monospaced", () => {
+  const sans = formatMarkdownForWechat("正文 `代码`", { fontPreset: "sans" });
+  const serif = formatMarkdownForWechat("正文", { fontPreset: "serif" });
+  const original = formatMarkdownForWechat("正文");
+
+  assert.match(sans, /<section style="[^"]*font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;/);
+  assert.match(sans, /<code style="[^"]*font-family: 'SF Mono', Monaco, Consolas, monospace;/);
+  assert.match(serif, /<section style="[^"]*font-family: 'Songti SC', 'STSong', SimSun, serif;/);
+  assert.doesNotMatch(original, /<section style="[^"]*font-family:/);
+  assert.equal(normalizeFontPreset("unexpected"), "default");
 });

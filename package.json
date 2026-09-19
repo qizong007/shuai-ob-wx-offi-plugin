@@ -1,6 +1,6 @@
 {
   "name": "shuai-ob-wx-offi-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Copy the active Obsidian note as WeChat Official Account rich text.",
   "main": "main.js",
   "type": "module",

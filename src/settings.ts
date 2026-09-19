@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { DEFAULT_LAYOUT_OPTIONS } from "./formatter";
+import { DEFAULT_LAYOUT_OPTIONS, WechatFontPreset } from "./formatter";
 import type WechatFormatterPlugin from "./main";
 
 export interface WechatFormatterSettings {
@@ -8,6 +8,7 @@ export interface WechatFormatterSettings {
   previewOpenMode: "split" | "tab";
   defaultLineHeight: number;
   defaultSidePadding: number;
+  defaultFontPreset: WechatFontPreset;
 }
 
 export const DEFAULT_SETTINGS: WechatFormatterSettings = {
@@ -16,6 +17,7 @@ export const DEFAULT_SETTINGS: WechatFormatterSettings = {
   previewOpenMode: "split",
   defaultLineHeight: DEFAULT_LAYOUT_OPTIONS.lineHeight,
   defaultSidePadding: DEFAULT_LAYOUT_OPTIONS.sidePadding,
+  defaultFontPreset: DEFAULT_LAYOUT_OPTIONS.fontPreset,
 };
 
 export class WechatFormatterSettingTab extends PluginSettingTab {
@@ -40,6 +42,20 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.previewOpenMode)
           .onChange(async (value) => {
             await this.plugin.setPreviewOpenMode(value === "tab" ? "tab" : "split");
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("正文字体")
+      .setDesc("用于预览和复制后的正文；代码块仍使用等宽字体。实际显示取决于设备已安装的字体。")
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("default", "跟随编辑器（默认）")
+          .addOption("sans", "无衬线（苹方 / 微软雅黑）")
+          .addOption("serif", "衬线（宋体）")
+          .setValue(this.plugin.settings.defaultFontPreset)
+          .onChange(async (value) => {
+            await this.plugin.setDefaultFontPreset(value);
           }),
       );
 

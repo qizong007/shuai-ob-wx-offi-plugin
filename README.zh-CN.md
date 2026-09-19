@@ -28,6 +28,7 @@ Key features include live preview, one-click rich-text copy, configurable footer
 - 自动把 Markdown 链接转成编号引用，并在文章最底部生成「引用源」。
 - 可在预览中实时调整正文行间距和页边距，复制结果与预览一致。
 - 可在设置中保存默认行间距和默认页边距。
+- 可在设置中选择正文字体：跟随编辑器（默认）、无衬线或宋体；代码仍使用等宽字体。
 - 自动忽略文件开头的 YAML Properties。
 - 原始 HTML 会被转义，避免在预览中直接执行。
 - 提供左侧 Ribbon 按钮和命令面板命令。

@@ -1,14 +1,27 @@
 import { marked } from "marked";
 
+export type WechatFontPreset = "default" | "sans" | "serif";
+
 export interface WechatLayoutOptions {
   lineHeight: number;
   sidePadding: number;
+  fontPreset: WechatFontPreset;
 }
 
 export const DEFAULT_LAYOUT_OPTIONS: WechatLayoutOptions = {
   lineHeight: 1.8,
   sidePadding: 16,
+  fontPreset: "default",
 };
+
+const FONT_FAMILIES: Record<WechatFontPreset, string> = {
+  default: "",
+  sans: "'PingFang SC', 'Microsoft YaHei', Arial, sans-serif",
+  serif: "'Songti SC', 'STSong', SimSun, serif",
+};
+
+export const normalizeFontPreset = (value: unknown): WechatFontPreset =>
+  value === "sans" || value === "serif" ? value : "default";
 
 export const normalizeLineHeight = (value: number): number =>
   Math.round(Math.min(2.5, Math.max(1.2, Number.isFinite(value) ? value : 1.8)) * 10) / 10;
@@ -53,6 +66,15 @@ const safeUrl = (value: string, image = false): string => {
 const stripFrontmatter = (markdown: string): string =>
   markdown.replace(/^---\s*\r?\n[\s\S]*?\r?\n---\s*(?:\r?\n|$)/, "");
 
+const wrapInlineCodeContent = (text: string): string => {
+  const blockStart = text.search(/<(?:p|ul|ol|div|section|blockquote|pre|table)\b/i);
+  const inlineEnd = blockStart < 0 ? text.length : blockStart;
+  const inlineContent = text.slice(0, inlineEnd);
+  return inlineContent.includes("<code ")
+    ? `<span style="line-height: inherit;">${inlineContent}</span>${text.slice(inlineEnd)}`
+    : text;
+};
+
 const FOOTER_SEPARATOR_MARKER = "<!-- shuai-footer-separator -->";
 let footerSeparatorPending = false;
 
@@ -80,7 +102,7 @@ renderer.heading = (text, level) => {
 };
 
 renderer.paragraph = (text) =>
-  `<p style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 18px 0;">${text}</p>`;
+  `<p style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 18px 0;">${wrapInlineCodeContent(text)}</p>`;
 
 renderer.strong = (text) => `<strong style="color: #333; font-weight: 600;">${text}</strong>`;
 renderer.em = (text) => `<em style="color: #555; font-style: italic; font-weight: 500;">${text}</em>`;
@@ -101,7 +123,7 @@ renderer.list = (body, ordered, start) => {
 };
 
 renderer.listitem = (text) =>
-  `<li style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 8px 0;">${text}</li>`;
+  `<li style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 8px 0;">${wrapInlineCodeContent(text)}</li>`;
 
 renderer.link = (href, title, text) => {
   const url = safeUrl(href ?? "");
@@ -185,7 +207,9 @@ export const formatMarkdownForWechat = (
   const sidePadding = normalizeSidePadding(
     layout.sidePadding ?? DEFAULT_LAYOUT_OPTIONS.sidePadding,
   );
-  return `<section style="line-height: ${lineHeight}; padding-left: ${sidePadding}px; padding-right: ${sidePadding}px;">${html}${renderLinkReferences()}</section>`;
+  const fontFamily = FONT_FAMILIES[normalizeFontPreset(layout.fontPreset)];
+  const fontStyle = fontFamily ? ` font-family: ${fontFamily};` : "";
+  return `<section style="line-height: ${lineHeight}; padding-left: ${sidePadding}px; padding-right: ${sidePadding}px;${fontStyle}">${html}${renderLinkReferences()}</section>`;
 };
 
 export const appendFooterMarkdown = (

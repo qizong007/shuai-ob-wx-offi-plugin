@@ -14,6 +14,7 @@ import WECHAT_COPY_ICON from "../assets/plugin-icon.svg";
 import {
   appendFooterMarkdown,
   formatMarkdownForWechat,
+  normalizeFontPreset,
   normalizeLineHeight,
   normalizeSidePadding,
   optimizeForWechat,
@@ -257,6 +258,7 @@ export default class WechatFormatterPlugin extends Plugin {
     return formatMarkdownForWechat(this.composeMarkdown(markdown), {
       lineHeight: this.previewLineHeight,
       sidePadding: this.previewSidePadding,
+      fontPreset: this.settings.defaultFontPreset,
     });
   }
 
@@ -294,6 +296,12 @@ export default class WechatFormatterPlugin extends Plugin {
     this.settings.defaultSidePadding = normalizeSidePadding(value);
     await this.saveSettings();
     this.resetPreviewLayout();
+  }
+
+  async setDefaultFontPreset(value: unknown): Promise<void> {
+    this.settings.defaultFontPreset = normalizeFontPreset(value);
+    await this.saveSettings();
+    this.refreshViews();
   }
 
   hasFooterMarkdown(): boolean {
@@ -423,6 +431,7 @@ export default class WechatFormatterPlugin extends Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
     this.settings.defaultLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
     this.settings.defaultSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
+    this.settings.defaultFontPreset = normalizeFontPreset(this.settings.defaultFontPreset);
   }
 
   private async saveSettings(): Promise<void> {
