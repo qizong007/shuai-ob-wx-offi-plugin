@@ -2,8 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   appendFooterMarkdown,
+  COLOR_THEMES,
+  COLOR_THEME_KEYS,
   DEFAULT_LAYOUT_OPTIONS,
   formatMarkdownForWechat,
+  normalizeColorTheme,
   normalizeFontPreset,
   normalizeLineHeight,
   normalizeSidePadding,
@@ -121,3 +124,44 @@ test("sets a selected body font while keeping code monospaced", () => {
   assert.doesNotMatch(original, /<section style="[^"]*font-family:/);
   assert.equal(normalizeFontPreset("unexpected"), "default");
 });
+
+test("applies the selected color theme across headings, quotes and code", () => {
+  const markdown = "# 标题\n\n## 小标题\n\n> 引用\n\n`代码`\n\n---";
+  const classic = formatMarkdownForWechat(markdown);
+  const ink = formatMarkdownForWechat(markdown, { colorTheme: "ink" });
+
+  assert.match(classic, /background-color: #4a4a4a/);
+  assert.match(ink, /background-color: #1f3a5f/);
+  assert.match(ink, /border-bottom: 2px solid #2f5b8f/);
+  assert.match(ink, /border-left: 4px solid #2f5b8f/);
+  assert.match(ink, /background: #f2f6fb/);
+  assert.match(ink, /color: #c7254e/);
+  assert.match(ink, /transparent, #2f5b8f, transparent/);
+  assert.doesNotMatch(ink, /#4a4a4a/);
+});
+
+test("falls back to the classic theme for unknown values", () => {
+  const html = formatMarkdownForWechat("# 标题", { colorTheme: "unexpected" as never });
+
+  assert.match(html, /background-color: #4a4a4a/);
+  assert.equal(normalizeColorTheme("unexpected"), "classic");
+  assert.equal(normalizeColorTheme("forest"), "forest");
+  assert.ok(COLOR_THEME_KEYS.length >= 2);
+  for (const key of COLOR_THEME_KEYS) {
+    assert.ok(COLOR_THEMES[key].label.length > 0);
+  }
+});
+
+test("colors level-2 headings, bold text and references with the theme", () => {
+  const markdown = "## 小标题\n\n**重点**\n\n[链接](https://example.com)";
+  const classic = formatMarkdownForWechat(markdown);
+  const forest = formatMarkdownForWechat(markdown, { colorTheme: "forest" });
+
+  assert.match(classic, /<h2 style="color: #1a1a1a/);
+  assert.match(classic, /<strong style="color: #333333/);
+  assert.match(forest, /<h2 style="color: #1e5e4e/);
+  assert.match(forest, /<strong style="color: #2e7d5b/);
+  assert.match(forest, /color: #2e7d5b; font-size: 14px; font-weight: 600[^>]*>引用源/);
+  assert.match(forest, /color: #2e7d5b; font-weight: 600;">\[1\] 链接/);
+});
+

@@ -13,11 +13,15 @@ import {
 import WECHAT_COPY_ICON from "../assets/plugin-icon.svg";
 import {
   appendFooterMarkdown,
+  COLOR_THEMES,
+  COLOR_THEME_KEYS,
   formatMarkdownForWechat,
+  normalizeColorTheme,
   normalizeFontPreset,
   normalizeLineHeight,
   normalizeSidePadding,
   optimizeForWechat,
+  WechatColorTheme,
 } from "./formatter";
 import {
   DEFAULT_SETTINGS,
@@ -36,6 +40,7 @@ class WechatPreviewView extends ItemView {
   private lineHeightValueEl: HTMLElement | null = null;
   private sidePaddingInput: HTMLInputElement | null = null;
   private sidePaddingValueEl: HTMLElement | null = null;
+  private themeSwatchContainer: HTMLElement | null = null;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -104,6 +109,29 @@ class WechatPreviewView extends ItemView {
     });
     this.sidePaddingValueEl = sidePaddingControl.createEl("output");
 
+    const themeControl = floatingControls.createDiv({
+      cls: "wechat-formatter-theme-control",
+    });
+    themeControl.createSpan({ text: "配色" });
+    this.themeSwatchContainer = themeControl.createDiv({
+      cls: "wechat-formatter-theme-swatches",
+    });
+    for (const key of COLOR_THEME_KEYS) {
+      const theme = COLOR_THEMES[key];
+      const swatch = this.themeSwatchContainer.createEl("button", {
+        cls: "wechat-formatter-theme-swatch",
+        attr: {
+          type: "button",
+          title: theme.label,
+          "aria-label": `配色：${theme.label}`,
+          "data-theme": key,
+        },
+      });
+      swatch.style.background = `linear-gradient(135deg, ${theme.palette.headingBackground} 0%, ${theme.palette.headingBackground} 55%, ${theme.palette.accent} 55%, ${theme.palette.accent} 100%)`;
+      swatch.addEventListener("click", () => this.plugin.setPreviewColorTheme(key));
+    }
+    this.updateThemeSwatches();
+
     const floatingActions = floatingControls.createDiv({
       cls: "wechat-formatter-floating-actions",
     });
@@ -131,6 +159,7 @@ class WechatPreviewView extends ItemView {
     this.noteNameEl.setText(file?.basename ?? "未打开 Markdown 笔记");
     this.updateFooterToggle();
     this.updateLayoutControls();
+    this.updateThemeSwatches();
     this.previewEl.empty();
 
     if (!markdown.trim()) {
@@ -173,6 +202,21 @@ class WechatPreviewView extends ItemView {
     if (this.sidePaddingInput) this.sidePaddingInput.value = String(sidePadding);
     if (this.sidePaddingValueEl) this.sidePaddingValueEl.setText(`${sidePadding}px`);
   }
+
+  private updateThemeSwatches(): void {
+    if (!this.themeSwatchContainer) return;
+
+    const activeTheme = this.plugin.getPreviewColorTheme();
+    for (const swatch of Array.from(
+      this.themeSwatchContainer.querySelectorAll<HTMLButtonElement>(
+        ".wechat-formatter-theme-swatch",
+      ),
+    )) {
+      const isActive = swatch.getAttribute("data-theme") === activeTheme;
+      swatch.classList.toggle("is-active", isActive);
+      swatch.setAttribute("aria-pressed", isActive ? "true" : "false");
+    }
+  }
 }
 
 export default class WechatFormatterPlugin extends Plugin {
@@ -182,6 +226,7 @@ export default class WechatFormatterPlugin extends Plugin {
   private refreshTimer: number | null = null;
   private previewLineHeight = 1.8;
   private previewSidePadding = 16;
+  private previewColorTheme: WechatColorTheme = "classic";
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -259,6 +304,7 @@ export default class WechatFormatterPlugin extends Plugin {
       lineHeight: this.previewLineHeight,
       sidePadding: this.previewSidePadding,
       fontPreset: this.settings.defaultFontPreset,
+      colorTheme: this.previewColorTheme,
     });
   }
 
@@ -268,6 +314,15 @@ export default class WechatFormatterPlugin extends Plugin {
 
   getPreviewSidePadding(): number {
     return this.previewSidePadding;
+  }
+
+  getPreviewColorTheme(): WechatColorTheme {
+    return this.previewColorTheme;
+  }
+
+  setPreviewColorTheme(value: unknown): void {
+    this.previewColorTheme = normalizeColorTheme(value);
+    this.refreshViews();
   }
 
   setPreviewLineHeight(value: number): void {
@@ -283,6 +338,7 @@ export default class WechatFormatterPlugin extends Plugin {
   resetPreviewLayout(refresh = true): void {
     this.previewLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
     this.previewSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
+    this.previewColorTheme = normalizeColorTheme(this.settings.defaultColorTheme);
     if (refresh) this.refreshViews();
   }
 
@@ -302,6 +358,12 @@ export default class WechatFormatterPlugin extends Plugin {
     this.settings.defaultFontPreset = normalizeFontPreset(value);
     await this.saveSettings();
     this.refreshViews();
+  }
+
+  async setDefaultColorTheme(value: unknown): Promise<void> {
+    this.settings.defaultColorTheme = normalizeColorTheme(value);
+    await this.saveSettings();
+    this.resetPreviewLayout();
   }
 
   hasFooterMarkdown(): boolean {
@@ -432,6 +494,7 @@ export default class WechatFormatterPlugin extends Plugin {
     this.settings.defaultLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
     this.settings.defaultSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
     this.settings.defaultFontPreset = normalizeFontPreset(this.settings.defaultFontPreset);
+    this.settings.defaultColorTheme = normalizeColorTheme(this.settings.defaultColorTheme);
   }
 
   private async saveSettings(): Promise<void> {

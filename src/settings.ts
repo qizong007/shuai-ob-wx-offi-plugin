@@ -1,5 +1,11 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { DEFAULT_LAYOUT_OPTIONS, WechatFontPreset } from "./formatter";
+import {
+  COLOR_THEMES,
+  COLOR_THEME_KEYS,
+  DEFAULT_LAYOUT_OPTIONS,
+  WechatColorTheme,
+  WechatFontPreset,
+} from "./formatter";
 import type WechatFormatterPlugin from "./main";
 
 export interface WechatFormatterSettings {
@@ -9,6 +15,7 @@ export interface WechatFormatterSettings {
   defaultLineHeight: number;
   defaultSidePadding: number;
   defaultFontPreset: WechatFontPreset;
+  defaultColorTheme: WechatColorTheme;
 }
 
 export const DEFAULT_SETTINGS: WechatFormatterSettings = {
@@ -18,6 +25,7 @@ export const DEFAULT_SETTINGS: WechatFormatterSettings = {
   defaultLineHeight: DEFAULT_LAYOUT_OPTIONS.lineHeight,
   defaultSidePadding: DEFAULT_LAYOUT_OPTIONS.sidePadding,
   defaultFontPreset: DEFAULT_LAYOUT_OPTIONS.fontPreset,
+  defaultColorTheme: DEFAULT_LAYOUT_OPTIONS.colorTheme,
 };
 
 export class WechatFormatterSettingTab extends PluginSettingTab {
@@ -58,6 +66,20 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
             await this.plugin.setDefaultFontPreset(value);
           }),
       );
+
+    new Setting(containerEl)
+      .setName("默认配色方案")
+      .setDesc("预览首次打开和复制时使用的配色，可在预览页面临时切换。")
+      .addDropdown((dropdown) => {
+        for (const key of COLOR_THEME_KEYS) {
+          dropdown.addOption(key, COLOR_THEMES[key].label);
+        }
+        dropdown
+          .setValue(this.plugin.settings.defaultColorTheme)
+          .onChange(async (value) => {
+            await this.plugin.setDefaultColorTheme(value);
+          });
+      });
 
     new Setting(containerEl)
       .setName("默认行间距")
