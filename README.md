@@ -1,187 +1,129 @@
 <p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="Shuai WeChat Formatter for Obsidian">
+  <img src="./assets/readme/hero.svg" width="100%" alt="Shuai WeChat Formatter：Obsidian 微信公众号排版助手">
 </p>
 
 # Shuai WeChat Formatter
 
-[简体中文](./README.zh-CN.md)
+[English](./README.en.md)
 
-Shuai WeChat Formatter is an Obsidian plugin for writers who publish through WeChat Official Accounts. Open a Markdown note, click the ribbon icon, and copy clean rich text with inline styles that can be pasted directly into the WeChat editor.
+一个面向微信公众号写作者的 Obsidian 插件。打开 Markdown 笔记，即可预览公众号排版，并一键复制为可直接粘贴的富文本。
 
-All formatting happens locally. The plugin does not upload notes, send network requests, collect analytics, or save copies of article content.
+这个插件主打极简：保留常用的排版能力，减少不必要的配置和操作。
 
-## Features
+## 功能亮点
 
-- Copy the active Markdown note as both `text/html` and `text/plain`.
-- Preview the WeChat layout in a split pane or a new tab.
-- Refresh the preview automatically while editing.
-- Add an optional Markdown footer for communities, products, contact details, or advertisements.
-- Toggle the footer directly from the floating preview controls.
-- Adjust line height and page margins before copying.
-- Save default line height and page margin values in plugin settings.
-- Choose a body font in plugin settings: editor default, sans-serif, or serif. Code remains monospaced.
-- Convert Markdown links into numbered references at the end of the article.
-- Ignore YAML frontmatter at the beginning of a note.
-- Escape raw HTML and sanitize generated preview content.
+- 一键复制当前 Markdown 笔记，并自动打开公众号预览。
+- 编辑笔记时实时刷新预览，复制结果与预览保持一致。
+- 支持字体、配色、行间距和左右页边距调整。
+- 支持 Markdown 格式的结尾内容，可用于社群、产品或联系方式。
+- 自动将正文外链整理为文末编号引用。
+- 全程本地处理，不上传笔记，不发送网络请求，也不收集数据。
 
-## Supported Markdown
+## 使用方法
 
-| Type | Support |
-| --- | --- |
-| H1-H6 headings | Yes |
-| Paragraphs and line breaks | Yes |
-| Bold and italic text | Yes |
-| Ordered and unordered lists | Yes |
-| Blockquotes | Yes |
-| Inline code and code blocks | Yes |
-| Links | Yes, converted to references |
-| Standard remote images | Yes |
-| Tables and horizontal rules | Yes |
-| Obsidian `![[local image]]` embeds | Not yet |
+1. 在 Obsidian 中打开一篇 Markdown 笔记。
+2. 点击左侧 Ribbon 中的“帅”字按钮。
+3. 在预览页检查或调整排版。
+4. 进入微信公众号编辑器，直接粘贴。
 
-## Installation
+需要重新复制时，点击预览顶部的「复制公众号格式」。
 
-After the plugin is accepted into the Obsidian Community directory, install it from **Settings → Community plugins → Browse**.
+## 安装
 
-For manual installation, download `main.js`, `manifest.json`, and `styles.css` from the latest GitHub release and place them in:
+在 Obsidian 中打开：
 
 ```text
-<your-vault>/.obsidian/plugins/shuai-wechat-formatter/
+设置 → 第三方插件 → 浏览 → 搜索 Shuai WeChat Formatter
 ```
 
-Restart Obsidian, open **Settings → Community plugins**, and enable **Shuai WeChat Formatter**.
+安装并启用即可。
 
-### Build from source
+也可以从最新的 GitHub Release 下载 `main.js`、`manifest.json` 和 `styles.css`，放入：
 
-Node.js 18 or later is required.
+```text
+<你的仓库>/.obsidian/plugins/shuai-wechat-formatter/
+```
+
+重启 Obsidian，然后在「设置 → 第三方插件」中启用。
+
+## 排版设置
+
+打开「设置 → Shuai WeChat Formatter」，可以配置：
+
+- 「预览」：选择右侧分栏或新标签页。
+- 「默认排版」：设置正文字体、配色、行间距和页边距。
+- 「结尾内容」：管理需要追加到文章末尾的 Markdown。
+
+预览页中的临时调整会影响下一次复制，但不会覆盖默认设置。
+
+## 支持的 Markdown
+
+| 类型 | 支持情况 |
+| --- | --- |
+| H1–H6 标题 | 支持 |
+| 段落与换行 | 支持 |
+| 粗体与斜体 | 支持 |
+| 有序、无序列表 | 支持 |
+| 引用 | 支持 |
+| 行内代码、代码块 | 支持 |
+| 链接 | 支持，转换为文末引用 |
+| 网络图片 | 支持，保留图片链接 |
+| 表格、分隔线 | 支持 |
+| Obsidian `![[本地图片]]` | 不支持自动上传 |
+
+## 图片处理
+
+本插件不提供图片上传和存储。文章中的图片需要使用可公开访问的网络链接；插件会保留这些链接，但不会自动处理 Obsidian 的 `![[本地图片]]`。
+
+我自己的方案是 [Image Auto Upload Plugin](https://github.com/renmu123/obsidian-image-auto-upload-plugin) 配合 [PicGo](https://picgo.github.io/PicGo-Doc/)：
+
+1. 在 PicGo 中配置自己的图床。
+2. 使用 Image Auto Upload Plugin 自动上传本地图片。
+3. 图片上传后，笔记中的本地引用会替换为网络链接。
+4. 再使用本插件复制公众号格式。
+
+Image Auto Upload Plugin 和 PicGo 负责图片上传，本插件只负责排版和复制。它们是推荐搭配，不是本插件的强制依赖。
+
+## 链接与引用源
+
+微信公众号编辑器无法稳定保留普通外链。插件会在链接原位置添加编号，并把网址集中到文章最后：
+
+```markdown
+查看 [Obsidian](https://obsidian.md)
+```
+
+转换后类似：
+
+```text
+查看 Obsidian[1]
+
+引用源
+[1] Obsidian
+    https://obsidian.md
+```
+
+## 隐私
+
+插件不发送网络请求，不收集数据，也不保存文章副本。笔记内容只在当前 Obsidian 窗口中转换，并在点击复制时写入系统剪贴板。
+
+## 已知限制
+
+- 当前没有针对 Obsidian 移动端做完整实机验证。
+- 微信公众号可能继续过滤部分 HTML 或样式，发布前请检查粘贴结果。
+
+## 本地开发
+
+需要 Node.js 18 或更高版本。
 
 ```bash
 git clone git@github.com:qizong007/shuai-ob-wx-offi-plugin.git
 cd shuai-ob-wx-offi-plugin
 npm install
-npm run build
-```
-
-## Usage
-
-1. Open a Markdown note in Obsidian.
-2. Click the WeChat ribbon icon containing the Chinese character “帅”.
-3. The plugin copies the formatted article and opens the preview.
-4. Paste the result into the WeChat Official Account editor.
-
-Use the **复制公众号格式** button at the top of the preview to copy the latest version again.
-
-## Footer content
-
-Open **Settings → Shuai WeChat Formatter** and enter Markdown footer content. For example:
-
-```markdown
-### Join the community
-
-Find more Obsidian and AI writing resources at <https://example.com>.
-```
-
-When enabled, the plugin inserts a visible horizontal rule before the footer. The floating controls in the lower-left corner of the preview can temporarily enable or disable the footer for both preview and copy output.
-
-## Preview and layout controls
-
-Choose how the preview opens in the plugin settings:
-
-- **Right split** opens the preview next to the current note.
-- **New tab** opens the preview in the current tab group.
-
-The floating preview panel provides two controls:
-
-- **Line height** ranges from `1.2` to `2.5`.
-- **Page margin** ranges from `0` to `48px`.
-
-Preview changes are temporary and affect the next copied result. Default values can be saved in plugin settings. The defaults are a line height of `1.8` and page margins of `16px`.
-
-## Link references
-
-WeChat may not preserve ordinary external links. The plugin replaces each Markdown link with a numbered reference and collects the source URLs at the very end of the article.
-
-```markdown
-Read the [Obsidian website](https://obsidian.md).
-```
-
-The output is structured like this:
-
-```text
-Read the Obsidian website[1].
-
-References
-[1] Obsidian website
-    https://obsidian.md
-```
-
-When footer content is enabled, the final order is article content, footer content, and then link references. Duplicate URLs share one reference number.
-
-## Commands
-
-The Obsidian command palette includes:
-
-- **复制当前笔记为公众号格式** — copy the active note in WeChat format.
-- **打开公众号预览** — open the WeChat preview.
-
-## How it works
-
-The plugin parses the current Markdown note and generates HTML with inline styles. Inline styles are used because the WeChat editor usually removes external stylesheets. Before copying, the plugin also removes effects that are poorly supported by WeChat, including shadows, filters, transitions, and rounded corners.
-
-Generated HTML is sanitized before it is inserted into the preview or clipboard fallback element. Link protocols are checked, and raw HTML from the note is escaped.
-
-## Development
-
-```bash
-npm install
 npm test
 npm run build
 ```
 
-- `npm test` runs formatter unit tests.
-- `npm run build` type-checks the TypeScript source and generates `main.js`.
-- `npm run dev` watches source files and rebuilds during development.
-
-Project structure:
-
-```text
-shuai-ob-wx-offi-plugin/
-├── assets/
-│   ├── plugin-icon.svg
-│   └── readme/hero.svg
-├── src/
-│   ├── formatter.ts
-│   ├── main.ts
-│   └── settings.ts
-├── tests/
-│   └── formatter.test.ts
-├── manifest.json
-├── versions.json
-├── styles.css
-└── package.json
-```
-
-## Known limitations
-
-- Obsidian WikiLinks and `![[local image]]` embeds are not converted into WeChat image assets.
-- Remote image handling still depends on the WeChat editor and its media policies.
-- Mobile behavior has not been fully tested on physical devices.
-- WeChat may filter additional HTML or styles, so review the pasted article before publishing.
-
-## Privacy
-
-The plugin does not send network requests, collect user data, or retain article copies. Note content stays inside the current Obsidian window and is written to the system clipboard only when the user requests a copy.
-
-## Contributing
-
-Issues and pull requests are welcome. Before submitting a change, run:
-
-```bash
-npm test
-npm run build
-```
-
-For changes related to WeChat styling compatibility, include both the Obsidian preview result and the result pasted into the WeChat editor.
+欢迎提交 Issue 或 Pull Request。涉及微信公众号样式兼容性的修改，请同时提供 Obsidian 预览和微信公众号编辑器粘贴结果。
 
 ## License
 

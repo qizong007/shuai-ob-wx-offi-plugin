@@ -1,35 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
-  <title id="title">shuai-ob-wx-offi-plugin</title>
-  <desc id="desc">将 Obsidian 当前笔记一键转换为微信公众号富文本，并在编辑区分栏预览。</desc>
-  <rect width="1200" height="380" rx="28" fill="#0B0F0E"/>
-  <path d="M0 300H1200" stroke="#26312D"/>
-  <g transform="translate(62 58)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
-    <text x="0" y="0" fill="#30C78A" font-size="18" font-weight="700" letter-spacing="2">OBSIDIAN PLUGIN · v0.1.0</text>
-    <text x="0" y="66" fill="#F4F7F5" font-size="54" font-weight="760">shuai-ob-wx-offi-plugin</text>
-    <text x="0" y="122" fill="#C8D1CD" font-size="25">把当前 Markdown 笔记，一键复制成公众号富文本。</text>
-    <g transform="translate(0 184)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18">
-      <rect width="148" height="44" rx="10" fill="#17201D" stroke="#35433E"/>
-      <text x="74" y="28" fill="#DDE5E1" text-anchor="middle">本地运行</text>
-      <rect x="162" width="148" height="44" rx="10" fill="#17201D" stroke="#35433E"/>
-      <text x="236" y="28" fill="#DDE5E1" text-anchor="middle">实时预览</text>
-      <rect x="324" width="178" height="44" rx="10" fill="#17201D" stroke="#35433E"/>
-      <text x="413" y="28" fill="#DDE5E1" text-anchor="middle">富文本剪贴板</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Shuai WeChat Formatter</title>
+  <desc id="desc">Obsidian 微信公众号排版助手，支持一键复制、实时预览和灵活排版。</desc>
+  <rect width="1200" height="360" rx="28" fill="#0B0F0E"/>
+  <path d="M0 286H1200" stroke="#26312D"/>
+
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+    <text x="64" y="54" fill="#30C78A" font-size="18" font-weight="700" letter-spacing="2">SHUAI WECHAT FORMATTER</text>
+    <text x="64" y="124" fill="#F4F7F5" font-size="54" font-weight="760">微信公众号排版助手</text>
+    <text x="64" y="174" fill="#C8D1CD" font-size="23">在 Obsidian 中预览、调整并一键复制公众号富文本。</text>
+
+    <g transform="translate(64 222)" fill="#DDE5E1" font-size="18">
+      <circle cx="6" cy="-6" r="5" fill="#30C78A"/>
+      <text x="20" y="0">一键复制</text>
+      <circle cx="136" cy="-6" r="5" fill="#30C78A"/>
+      <text x="150" y="0">实时预览</text>
+      <circle cx="272" cy="-6" r="5" fill="#30C78A"/>
+      <text x="286" y="0">排版可调</text>
     </g>
   </g>
-  <g transform="translate(760 50)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
-    <rect x="0" y="0" width="166" height="224" rx="18" fill="#F4F7F5"/>
-    <path d="M24 44H142M24 76H116M24 108H136M24 140H102" stroke="#84928C" stroke-width="8" stroke-linecap="round"/>
-    <rect x="24" y="172" width="72" height="20" rx="6" fill="#30C78A"/>
-    <text x="24" y="26" fill="#26312D" font-size="15" font-weight="700">NOTE.MD</text>
-    <path d="M187 112H230" stroke="#30C78A" stroke-width="4" stroke-linecap="round"/>
-    <path d="M218 100L230 112 218 124" fill="none" stroke="#30C78A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="252" y="24" width="148" height="200" rx="18" fill="#17201D" stroke="#35433E"/>
-    <rect x="274" y="48" width="104" height="34" rx="6" fill="#30C78A"/>
-    <path d="M274 110H378M274 136H358M274 162H370M274 188H340" stroke="#93A19B" stroke-width="7" stroke-linecap="round"/>
-    <text x="326" y="71" fill="#07100D" font-size="15" font-weight="800" text-anchor="middle">公众号预览</text>
+
+  <g transform="translate(748 30)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+    <rect x="0" y="14" width="154" height="210" rx="18" fill="#F4F7F5"/>
+    <text x="22" y="43" fill="#26312D" font-size="15" font-weight="700">NOTE.MD</text>
+    <path d="M22 66H132M22 98H112M22 130H128M22 162H98" stroke="#84928C" stroke-width="8" stroke-linecap="round"/>
+    <rect x="22" y="184" width="68" height="20" rx="6" fill="#30C78A"/>
+
+    <path d="M178 116H218" stroke="#30C78A" stroke-width="4" stroke-linecap="round"/>
+    <path d="M206 104L218 116 206 128" fill="none" stroke="#30C78A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <rect x="240" y="0" width="180" height="238" rx="20" fill="#17201D" stroke="#35433E"/>
+    <rect x="258" y="20" width="36" height="36" rx="9" fill="#30C78A"/>
+    <g transform="translate(262 24) scale(0.027)" fill="#07100D">
+      <path d="M250.368 549.888c-2.56-3.072 4.096-21.504 5.12-24.576 5.632-22.016 12.8-43.52 22.016-64 29.696-67.584 76.8-126.976 135.68-172.032C537.6 193.536 706.048 169.984 851.456 230.4c-3.072-1.024-7.68-13.824-9.216-16.384-9.216-14.848-18.944-28.672-30.208-41.984-34.816-42.496-77.824-78.848-126.464-104.448-119.808-61.952-263.68-53.76-374.272 24.064-67.072 47.104-119.808 121.856-134.656 202.752-11.776 65.024 3.584 134.144 33.28 192.512 11.264 22.528 25.088 43.52 40.448 62.976z"/>
+      <path d="M559.616 305.664c12.288-5.12 51.2 15.36 61.44 19.968 48.64 20.992 92.16 52.736 127.488 91.648 102.4 112.128 134.656 278.016 72.192 417.792-9.216 20.48-20.48 40.448-33.28 58.88-7.168 10.24-14.336 19.968-22.528 29.184-4.608 5.632-17.92 25.6-24.576 26.624 68.096-11.776 135.168-55.296 181.248-104.96 117.76-125.44 140.288-321.024 27.136-457.216-4.608-5.12-9.216-10.752-13.824-15.36-95.744-100.352-249.856-120.32-375.296-66.56z"/>
+      <path d="M92.16 363.52s-10.24 210.432 223.232 366.08c0 0 22.528 5.12 16.384 31.232l-13.824 72.704s-7.68 33.792 25.088 16.384l81.408-53.76s16.384-17.408 50.176-10.24c0 0 176.64 30.208 293.376-72.704-2.048 1.536-2.048 13.312-2.56 15.872-3.072 14.336-6.656 28.16-11.264 41.984-14.848 43.52-36.864 84.48-67.584 118.784-107.52 122.368-291.84 126.464-437.76 82.944-103.424-31.232-195.584-103.424-230.4-207.872C-5.12 694.784-5.12 618.496 15.36 547.328c8.704-30.72 16.896-60.928 28.672-90.624 6.656-16.384 13.824-32.768 22.016-48.64 4.608-10.24 26.112-34.816 26.112-44.544z"/>
+      <text x="512" y="650" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="360" font-weight="800">帅</text>
+    </g>
+    <text x="306" y="45" fill="#F4F7F5" font-size="14" font-weight="700">公众号预览</text>
+    <path d="M260 86H398M260 116H378M260 146H390M260 176H360M260 206H386" stroke="#93A19B" stroke-width="7" stroke-linecap="round"/>
   </g>
-  <g transform="translate(62 335)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#87958F">
-    <text>MARKDOWN → INLINE HTML → CLIPBOARD</text>
-    <text x="1076" text-anchor="end">MIT</text>
+
+  <g transform="translate(64 327)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" fill="#87958F">
+    <text>MARKDOWN → 预览 → 复制</text>
+    <text x="1072" text-anchor="end">MIT</text>
   </g>
 </svg>

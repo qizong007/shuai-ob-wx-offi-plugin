@@ -63,9 +63,64 @@
   background: var(--interactive-accent);
 }
 
+.wechat-formatter-settings {
+  max-width: 760px;
+  padding-bottom: 48px;
+}
+
+.wechat-formatter-settings-title {
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.wechat-formatter-settings-intro {
+  max-width: 620px;
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.wechat-formatter-settings-section {
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  background: var(--background-primary-alt);
+}
+
+.wechat-formatter-settings-section-header {
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary-alt);
+}
+
+.wechat-formatter-settings-section-header h3 {
+  margin: 0;
+  color: var(--text-normal);
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-semibold);
+  letter-spacing: -0.01em;
+}
+
+.wechat-formatter-settings-section-header p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.5;
+}
+
+.wechat-formatter-settings-section-content > .setting-item {
+  padding: 16px 18px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.wechat-formatter-settings-section-content > .setting-item:first-child {
+  border-top: 0;
+}
+
 .wechat-formatter-settings-textarea {
   width: 100%;
-  min-height: 220px;
+  min-height: 180px;
   font-family: var(--font-monospace);
   line-height: 1.5;
   resize: vertical;
@@ -84,6 +139,14 @@
 
 .wechat-formatter-footer-setting .setting-item-control {
   justify-content: flex-start;
+}
+
+@media (max-width: 600px) {
+  .wechat-formatter-settings-section-header,
+  .wechat-formatter-settings-section-content > .setting-item {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
 }
 
 .wechat-formatter-floating-controls {

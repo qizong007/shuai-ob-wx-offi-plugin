@@ -39,8 +39,24 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
+    containerEl.addClass("wechat-formatter-settings");
 
-    new Setting(containerEl)
+    containerEl.createEl("h2", {
+      cls: "wechat-formatter-settings-title",
+      text: "微信公众号排版",
+    });
+    containerEl.createEl("p", {
+      cls: "wechat-formatter-settings-intro",
+      text: "设置预览打开方式、默认排版和文章结尾内容。预览页中的临时调整不会覆盖这里的默认值。",
+    });
+
+    const previewSection = this.createSection(
+      containerEl,
+      "预览",
+      "控制公众号预览在 Obsidian 中的打开位置。",
+    );
+
+    new Setting(previewSection)
       .setName("预览打开方式")
       .setDesc("选择点击预览或复制按钮后，公众号预览出现的位置。")
       .addDropdown((dropdown) =>
@@ -53,7 +69,13 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
+    const typographySection = this.createSection(
+      containerEl,
+      "默认排版",
+      "这些设置会用于首次打开预览和复制公众号格式。",
+    );
+
+    new Setting(typographySection)
       .setName("正文字体")
       .setDesc("用于预览和复制后的正文；代码块仍使用等宽字体。实际显示取决于设备已安装的字体。")
       .addDropdown((dropdown) =>
@@ -67,7 +89,7 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
+    new Setting(typographySection)
       .setName("默认配色方案")
       .setDesc("预览首次打开和复制时使用的配色，可在预览页面临时切换。")
       .addDropdown((dropdown) => {
@@ -81,7 +103,7 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
           });
       });
 
-    new Setting(containerEl)
+    new Setting(typographySection)
       .setName("默认行间距")
       .setDesc("预览首次打开时使用的正文行高，可在预览页临时调整。")
       .addSlider((slider) =>
@@ -93,7 +115,7 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
+    new Setting(typographySection)
       .setName("默认页边距")
       .setDesc("预览首次打开时使用的左右内边距，单位为 px。")
       .addSlider((slider) =>
@@ -105,7 +127,13 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
+    const footerSection = this.createSection(
+      containerEl,
+      "结尾内容",
+      "统一管理文章末尾追加的社群、产品、联系方式或广告信息。",
+    );
+
+    new Setting(footerSection)
       .setName("启用结尾钩子")
       .setDesc("复制和预览时，在正文末尾追加分隔线与配置的 Markdown 内容。")
       .addToggle((toggle) =>
@@ -114,7 +142,7 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
         }),
       );
 
-    const footerSetting = new Setting(containerEl)
+    const footerSetting = new Setting(footerSection)
       .setName("结尾钩子 Markdown")
       .setDesc("适合填写社群、产品、联系方式或广告位。插件会在它前面自动添加一条可见分隔线。")
       .addTextArea((textArea) => {
@@ -127,5 +155,15 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
         textArea.inputEl.addClass("wechat-formatter-settings-textarea");
       });
     footerSetting.settingEl.addClass("wechat-formatter-footer-setting");
+  }
+
+  private createSection(containerEl: HTMLElement, title: string, description: string): HTMLElement {
+    const section = containerEl.createEl("section", {
+      cls: "wechat-formatter-settings-section",
+    });
+    const header = section.createDiv({ cls: "wechat-formatter-settings-section-header" });
+    header.createEl("h3", { text: title });
+    header.createEl("p", { text: description });
+    return section.createDiv({ cls: "wechat-formatter-settings-section-content" });
   }
 }
