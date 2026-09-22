@@ -83,9 +83,23 @@ class WechatPreviewView extends ItemView {
     const floatingHeader = floatingControls.createDiv({
       cls: "wechat-formatter-floating-header",
     });
-    floatingHeader.createEl("strong", { text: "排版调整" });
+    const collapseButton = floatingHeader.createEl("button", {
+      cls: "wechat-formatter-collapse-button",
+      attr: { type: "button", "aria-label": "收起排版调整", "aria-expanded": "true" },
+    });
+    collapseButton.createEl("strong", { text: "排版调整" });
+    collapseButton.createSpan({ cls: "wechat-formatter-collapse-icon", attr: { "aria-hidden": "true" } });
+    const floatingBody = floatingControls.createDiv({
+      cls: "wechat-formatter-floating-body",
+    });
+    collapseButton.addEventListener("click", () => {
+      const collapsed = floatingControls.classList.toggle("is-collapsed");
+      floatingBody.hidden = collapsed;
+      collapseButton.setAttribute("aria-expanded", String(!collapsed));
+      collapseButton.setAttribute("aria-label", collapsed ? "展开排版调整" : "收起排版调整");
+    });
 
-    const lineHeightControl = floatingControls.createEl("label", {
+    const lineHeightControl = floatingBody.createEl("label", {
       cls: "wechat-formatter-range-control",
     });
     lineHeightControl.createSpan({ text: "行间距" });
@@ -97,7 +111,7 @@ class WechatPreviewView extends ItemView {
     });
     this.lineHeightValueEl = lineHeightControl.createEl("output");
 
-    const sidePaddingControl = floatingControls.createEl("label", {
+    const sidePaddingControl = floatingBody.createEl("label", {
       cls: "wechat-formatter-range-control",
     });
     sidePaddingControl.createSpan({ text: "页边距" });
@@ -109,7 +123,7 @@ class WechatPreviewView extends ItemView {
     });
     this.sidePaddingValueEl = sidePaddingControl.createEl("output");
 
-    const themeControl = floatingControls.createDiv({
+    const themeControl = floatingBody.createDiv({
       cls: "wechat-formatter-theme-control",
     });
     themeControl.createSpan({ text: "配色" });
@@ -132,7 +146,7 @@ class WechatPreviewView extends ItemView {
     }
     this.updateThemeSwatches();
 
-    const floatingActions = floatingControls.createDiv({
+    const floatingActions = floatingBody.createDiv({
       cls: "wechat-formatter-floating-actions",
     });
     this.footerToggleButton = floatingActions.createEl("button", {
