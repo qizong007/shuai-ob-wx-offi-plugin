@@ -49,7 +49,7 @@ test("appends an enabled footer behind a rendered separator", () => {
   );
   assert.doesNotMatch(html, /shuai-footer-separator/);
   assert.match(html, /<hr style="[^"]*margin: 42px 0;/);
-  assert.match(html, />加入社群<\/h3>/);
+  assert.match(html, />加入社群<\/span><\/h3>/);
 });
 
 test("does not append a disabled or empty footer", () => {
@@ -91,6 +91,38 @@ test("inline code keeps paragraph and list text in one inline container", () => 
   assert.match(html, /<\/span>\s*<ul style=/);
 });
 
+test("keeps mixed inline text together with an explicit paragraph line height", () => {
+  const html = formatMarkdownForWechat(
+    "正文 **加粗** 和 *斜体*，还有 [链接](https://example.com) 与 `代码`。",
+    { lineHeight: 2.1 },
+  );
+
+  assert.match(html, /<p style="[^"]*line-height: 2.1;[^\"]*"><span style="line-height: inherit;">正文 /);
+  assert.match(html, /<\/code>。<\/span><\/p>/);
+  assert.match(html, /<sup[^>]*>\[1\]<\/sup>/);
+});
+
+test("centers images without adding fixed content widths", () => {
+  const html = optimizeForWechat(
+    formatMarkdownForWechat("![插图](https://example.com/image.png)"),
+  );
+
+  assert.match(html, /<img[^>]*style="display: block; max-width: 100%; height: auto; [^"]*margin: 15px auto;/);
+  assert.doesNotMatch(html, /<span[^>]*><img/);
+  assert.doesNotMatch(html, /width: \d+px/);
+});
+
+test("does not leave a line break in text immediately before a block image", () => {
+  const html = optimizeForWechat(formatMarkdownForWechat(
+    "20. 完成啦！\n![截图](https://example.com/one.png)\n\n操作完了。\n![截图](https://example.com/two.png)\n\n正常换行\n第二行",
+  ));
+
+  assert.match(html, /<li[^>]*><span style="line-height: inherit;">完成啦！<\/span><img/);
+  assert.match(html, /<p[^>]*><span style="line-height: inherit;">操作完了。<\/span><img/);
+  assert.doesNotMatch(html, /<br><\/span><img/);
+  assert.match(html, /正常换行<br>第二行<\/span>/);
+});
+
 test("applies adjustable line height and side padding to the output", () => {
   const html = formatMarkdownForWechat("正文", {
     lineHeight: 2.1,
@@ -99,7 +131,7 @@ test("applies adjustable line height and side padding to the output", () => {
 
   assert.match(html, /^<section style="line-height: 2.1;/);
   assert.match(html, /padding-left: 28px; padding-right: 28px;/);
-  assert.match(html, /line-height: inherit/);
+  assert.match(html, /<p style="[^"]*line-height: 2.1;/);
 });
 
 test("uses safe layout defaults and clamps invalid values", () => {
@@ -164,4 +196,3 @@ test("colors level-2 headings, bold text and references with the theme", () => {
   assert.match(forest, /color: #2e7d5b; font-size: 14px; font-weight: 600[^>]*>引用源/);
   assert.match(forest, /color: #2e7d5b; font-weight: 600;">\[1\] 链接/);
 });
-

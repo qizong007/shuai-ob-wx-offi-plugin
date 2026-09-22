@@ -189,11 +189,13 @@ const safeUrl = (value: string, image = false): string => {
 const stripFrontmatter = (markdown: string): string =>
   markdown.replace(/^---\s*\r?\n[\s\S]*?\r?\n---\s*(?:\r?\n|$)/, "");
 
-const wrapInlineCodeContent = (text: string): string => {
-  const blockStart = text.search(/<(?:p|ul|ol|div|section|blockquote|pre|table)\b/i);
+const wrapInlineContent = (text: string): string => {
+  const blockStart = text.search(/<(?:p|ul|ol|div|section|blockquote|pre|table|img)\b/i);
   const inlineEnd = blockStart < 0 ? text.length : blockStart;
-  const inlineContent = text.slice(0, inlineEnd);
-  return inlineContent.includes("<code ")
+  const inlineContent = /^<img\b/i.test(text.slice(inlineEnd))
+    ? text.slice(0, inlineEnd).replace(/(?:<br\s*\/?>\s*)+$/gi, "")
+    : text.slice(0, inlineEnd);
+  return inlineContent.trim()
     ? `<span style="line-height: inherit;">${inlineContent}</span>${text.slice(inlineEnd)}`
     : text;
 };
@@ -201,6 +203,7 @@ const wrapInlineCodeContent = (text: string): string => {
 const FOOTER_SEPARATOR_MARKER = "<!-- shuai-footer-separator -->";
 let footerSeparatorPending = false;
 let activePalette: WechatColorPalette = COLOR_THEMES.classic.palette;
+let activeLineHeight = DEFAULT_LAYOUT_OPTIONS.lineHeight;
 
 interface LinkReference {
   label: string;
@@ -215,18 +218,18 @@ const renderer = new marked.Renderer();
 renderer.heading = (text, level) => {
   switch (level) {
     case 1:
-      return `<p style="text-align: center; margin: 35px 0 30px 0;"><strong style="color: white; background-color: ${activePalette.headingBackground}; font-size: 24px; font-weight: 600; line-height: 1.6; padding: 20px 30px; display: inline-block;">${text}</strong></p>`;
+      return `<p style="text-align: center; margin: 35px 0 30px 0;"><strong style="color: white; background-color: ${activePalette.headingBackground}; font-size: 24px; font-weight: 600; line-height: 1.6; padding: 20px 30px; display: inline-block;">${wrapInlineContent(text)}</strong></p>`;
     case 2:
-      return `<h2 style="color: ${activePalette.headingColor}; font-size: 20px; font-weight: 600; line-height: 1.5; margin: 35px 0 20px 0; padding-bottom: 8px; border-bottom: 2px solid ${activePalette.accent};">${text}</h2>`;
+      return `<h2 style="color: ${activePalette.headingColor}; font-size: 20px; font-weight: 600; line-height: 1.5; margin: 35px 0 20px 0; padding-bottom: 8px; border-bottom: 2px solid ${activePalette.accent};">${wrapInlineContent(text)}</h2>`;
     case 3:
-      return `<h3 style="color: ${activePalette.accent}; font-size: 18px; font-weight: 500; line-height: 1.4; margin: 28px 0 12px 0;">${text}</h3>`;
+      return `<h3 style="color: ${activePalette.accent}; font-size: 18px; font-weight: 500; line-height: 1.4; margin: 28px 0 12px 0;">${wrapInlineContent(text)}</h3>`;
     default:
-      return `<h${level} style="color: #2a2a2a; font-size: ${20 - level}px; font-weight: 500; line-height: 1.4; margin: 14px 0 8px 0;">${text}</h${level}>`;
+      return `<h${level} style="color: #2a2a2a; font-size: ${20 - level}px; font-weight: 500; line-height: 1.4; margin: 14px 0 8px 0;">${wrapInlineContent(text)}</h${level}>`;
   }
 };
 
 renderer.paragraph = (text) =>
-  `<p style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 18px 0;">${wrapInlineCodeContent(text)}</p>`;
+  `<p style="color: #1a1a1a; font-size: 16px; line-height: ${activeLineHeight}; margin: 18px 0;">${wrapInlineContent(text)}</p>`;
 
 renderer.strong = (text) =>
   `<strong style="color: ${activePalette.strongColor}; font-weight: 600;">${text}</strong>`;
@@ -248,7 +251,7 @@ renderer.list = (body, ordered, start) => {
 };
 
 renderer.listitem = (text) =>
-  `<li style="color: #1a1a1a; font-size: 16px; line-height: inherit; margin: 8px 0;">${wrapInlineCodeContent(text)}</li>`;
+  `<li style="color: #1a1a1a; font-size: 16px; line-height: ${activeLineHeight}; margin: 8px 0;">${wrapInlineContent(text)}</li>`;
 
 renderer.link = (href, title, text) => {
   const url = safeUrl(href ?? "");
@@ -271,7 +274,7 @@ renderer.image = (href, title, text) => {
   const url = safeUrl(href ?? "", true);
   const titleAttribute = title ? ` title="${escapeHtml(title)}"` : "";
   const altAttribute = text ? ` alt="${escapeHtml(text)}"` : "";
-  return `<img src="${url}"${titleAttribute}${altAttribute} style="max-width: 100%; height: auto; border-radius: 8px; margin: 15px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">`;
+  return `<img src="${url}"${titleAttribute}${altAttribute} style="display: block; max-width: 100%; height: auto; border-radius: 8px; margin: 15px auto; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">`;
 };
 
 renderer.hr = () => {
@@ -313,7 +316,7 @@ const renderLinkReferences = (): string => {
   const items = linkReferences
     .map(
       ({ label, url }, index) =>
-        `<li style="color: #555; font-size: 13px; line-height: inherit; margin: 10px 0; word-break: break-all;"><span style="color: ${activePalette.strongColor}; font-weight: 600;">[${index + 1}] ${label}</span><br><span style="color: #777;">${url}</span></li>`,
+        `<li style="color: #555; font-size: 13px; line-height: ${activeLineHeight}; margin: 10px 0; word-break: break-all;"><span style="line-height: inherit;"><span style="color: ${activePalette.strongColor}; font-weight: 600;">[${index + 1}] ${label}</span><br><span style="color: #777;">${url}</span></span></li>`,
     )
     .join("");
 
@@ -328,8 +331,9 @@ export const formatMarkdownForWechat = (
   linkReferenceNumbers.clear();
   footerSeparatorPending = false;
   activePalette = COLOR_THEMES[normalizeColorTheme(layout.colorTheme)].palette;
-  const html = marked.parse(stripFrontmatter(markdown)).trim();
   const lineHeight = normalizeLineHeight(layout.lineHeight ?? DEFAULT_LAYOUT_OPTIONS.lineHeight);
+  activeLineHeight = lineHeight;
+  const html = marked.parse(stripFrontmatter(markdown)).trim();
   const sidePadding = normalizeSidePadding(
     layout.sidePadding ?? DEFAULT_LAYOUT_OPTIONS.sidePadding,
   );
