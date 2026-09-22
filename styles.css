@@ -69,6 +69,8 @@
 }
 
 .wechat-formatter-settings-title {
+  padding: 0;
+  border: 0;
   margin-bottom: 6px;
   letter-spacing: -0.02em;
 }
@@ -94,7 +96,12 @@
   background: var(--background-secondary-alt);
 }
 
-.wechat-formatter-settings-section-header h3 {
+.wechat-formatter-settings-section-header > .setting-item {
+  padding: 0;
+  border: 0;
+}
+
+.wechat-formatter-settings-section-header .setting-item-name {
   margin: 0;
   color: var(--text-normal);
   font-size: var(--font-ui-medium);

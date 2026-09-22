@@ -41,10 +41,8 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
     containerEl.empty();
     containerEl.addClass("wechat-formatter-settings");
 
-    containerEl.createEl("h2", {
-      cls: "wechat-formatter-settings-title",
-      text: "微信公众号排版",
-    });
+    const pageHeading = new Setting(containerEl).setName("微信公众号排版").setHeading();
+    pageHeading.settingEl.addClass("wechat-formatter-settings-title");
     containerEl.createEl("p", {
       cls: "wechat-formatter-settings-intro",
       text: "设置预览打开方式、默认排版和文章结尾内容。预览页中的临时调整不会覆盖这里的默认值。",
@@ -162,7 +160,7 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
       cls: "wechat-formatter-settings-section",
     });
     const header = section.createDiv({ cls: "wechat-formatter-settings-section-header" });
-    header.createEl("h3", { text: title });
+    new Setting(header).setName(title).setHeading();
     header.createEl("p", { text: description });
     return section.createDiv({ cls: "wechat-formatter-settings-section-content" });
   }
