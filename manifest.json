@@ -1,9 +1,10 @@
 {
   "id": "shuai-wechat-formatter",
   "name": "Shuai WeChat Formatter",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "minAppVersion": "1.7.2",
   "description": "Preview and copy Markdown notes as WeChat Official Account rich text.",
   "author": "qizong007",
+  "fundingUrl": "https://github.com/qizong007/shuai-ob-wx-offi-plugin#%E6%94%AF%E6%8C%81%E4%BD%9C%E8%80%85",
   "isDesktopOnly": false
 }

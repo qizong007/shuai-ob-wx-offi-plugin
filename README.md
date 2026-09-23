@@ -111,6 +111,14 @@ Image Auto Upload Plugin 和 PicGo 负责图片上传，本插件只负责排版
 - 当前没有针对 Obsidian 移动端做完整实机验证。
 - 微信公众号可能继续过滤部分 HTML 或样式，发布前请检查粘贴结果。
 
+## 支持作者
+
+如果这个插件帮你省下了一点排版时间，欢迎请我喝杯豆浆 ☕️
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/qizong007/shuai-ob-wx-offi-plugin/main/assets/readme/buy-me-a-soy-milk.jpg" width="420" alt="王帅真的赞赏码：Buy me a 豆浆">
+</p>
+
 ## 本地开发
 
 需要 Node.js 18 或更高版本。

@@ -176,6 +176,14 @@ For local images, one option is [Image Auto Upload Plugin](https://github.com/re
 - Mobile behavior has not been fully tested on physical devices.
 - WeChat may filter additional HTML or styles, so review the pasted article before publishing.
 
+## Support the author
+
+If this plugin saves you some formatting time, you can buy me a soy milk ☕️
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/qizong007/shuai-ob-wx-offi-plugin/main/assets/readme/buy-me-a-soy-milk.jpg" width="420" alt="Wang Shuaizhen's WeChat appreciation code: Buy me a soy milk">
+</p>
+
 ## Privacy
 
 The plugin does not send network requests, collect user data, or retain article copies. Note content stays inside the current Obsidian window and is written to the system clipboard only when the user requests a copy.
