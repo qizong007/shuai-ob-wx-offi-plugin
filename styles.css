@@ -83,17 +83,11 @@
 }
 
 .wechat-formatter-settings-section {
-  margin-top: 24px;
-  overflow: hidden;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-l);
-  background: var(--background-primary-alt);
+  margin-top: 28px;
 }
 
 .wechat-formatter-settings-section-header {
-  padding: 16px 18px 14px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary-alt);
+  padding: 0;
 }
 
 .wechat-formatter-settings-section-header > .setting-item {
@@ -109,20 +103,9 @@
   letter-spacing: -0.01em;
 }
 
-.wechat-formatter-settings-section-header p {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: var(--font-ui-smaller);
-  line-height: 1.5;
-}
-
 .wechat-formatter-settings-section-content > .setting-item {
-  padding: 16px 18px;
+  padding: 14px 0;
   border-top: 1px solid var(--background-modifier-border);
-}
-
-.wechat-formatter-settings-section-content > .setting-item:first-child {
-  border-top: 0;
 }
 
 .wechat-formatter-settings-textarea {
@@ -149,10 +132,9 @@
 }
 
 @media (max-width: 600px) {
-  .wechat-formatter-settings-section-header,
-  .wechat-formatter-settings-section-content > .setting-item {
-    padding-right: 14px;
-    padding-left: 14px;
+  .wechat-formatter-settings {
+    padding-right: 4px;
+    padding-left: 4px;
   }
 }
 
@@ -298,10 +280,44 @@
   font-size: var(--font-ui-smaller);
 }
 
+.wechat-formatter-style-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wechat-formatter-view button.wechat-formatter-style-pill {
+  padding: 3px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-smaller);
+  line-height: 1.6;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.wechat-formatter-view button.wechat-formatter-style-pill:hover {
+  color: var(--text-normal);
+  border-color: var(--text-faint);
+}
+
+.wechat-formatter-view button.wechat-formatter-style-pill.is-active {
+  border-color: var(--interactive-accent);
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
 .wechat-formatter-theme-swatches {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.wechat-formatter-view button.wechat-formatter-theme-swatch-auto {
+  background: conic-gradient(#e8845c, #c05621, #6d44a8, #1e50ff, #2e7d5b, #e8845c);
 }
 
 .wechat-formatter-theme-swatch {

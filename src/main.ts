@@ -15,13 +15,19 @@ import {
   appendFooterMarkdown,
   COLOR_THEMES,
   COLOR_THEME_KEYS,
+  DEFAULT_HEADER_OPTIONS,
   formatMarkdownForWechat,
-  normalizeColorTheme,
+  normalizeColorThemeChoice,
   normalizeFontPreset,
+  normalizeHeaderStyle,
   normalizeLineHeight,
   normalizeSidePadding,
+  normalizeStyleTheme,
   optimizeForWechat,
-  WechatColorTheme,
+  STYLE_THEMES,
+  STYLE_THEME_KEYS,
+  WechatColorThemeChoice,
+  WechatStyleTheme,
 } from "./formatter";
 import {
   DEFAULT_SETTINGS,
@@ -36,11 +42,13 @@ class WechatPreviewView extends ItemView {
   private noteNameEl: HTMLElement | null = null;
   private previewEl: HTMLElement | null = null;
   private footerToggleButton: HTMLButtonElement | null = null;
+  private headerToggleButton: HTMLButtonElement | null = null;
   private lineHeightInput: HTMLInputElement | null = null;
   private lineHeightValueEl: HTMLElement | null = null;
   private sidePaddingInput: HTMLInputElement | null = null;
   private sidePaddingValueEl: HTMLElement | null = null;
   private themeSwatchContainer: HTMLElement | null = null;
+  private styleThemePillContainer: HTMLElement | null = null;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -123,6 +131,29 @@ class WechatPreviewView extends ItemView {
     });
     this.sidePaddingValueEl = sidePaddingControl.createEl("output");
 
+    const styleThemeControl = floatingBody.createDiv({
+      cls: "wechat-formatter-theme-control",
+    });
+    styleThemeControl.createSpan({ text: "主题" });
+    this.styleThemePillContainer = styleThemeControl.createDiv({
+      cls: "wechat-formatter-style-themes",
+    });
+    for (const key of STYLE_THEME_KEYS) {
+      const styleTheme = STYLE_THEMES[key];
+      const pill = this.styleThemePillContainer.createEl("button", {
+        cls: "wechat-formatter-style-pill",
+        text: styleTheme.label,
+        attr: {
+          type: "button",
+          title: styleTheme.description,
+          "aria-label": `主题：${styleTheme.label}`,
+          "data-style-theme": key,
+        },
+      });
+      pill.addEventListener("click", () => this.plugin.setPreviewStyleTheme(key));
+    }
+    this.updateStyleThemePills();
+
     const themeControl = floatingBody.createDiv({
       cls: "wechat-formatter-theme-control",
     });
@@ -130,6 +161,16 @@ class WechatPreviewView extends ItemView {
     this.themeSwatchContainer = themeControl.createDiv({
       cls: "wechat-formatter-theme-swatches",
     });
+    const autoSwatch = this.themeSwatchContainer.createEl("button", {
+      cls: "wechat-formatter-theme-swatch wechat-formatter-theme-swatch-auto",
+      attr: {
+        type: "button",
+        title: "跟随主题",
+        "aria-label": "配色：跟随主题",
+        "data-theme": "auto",
+      },
+    });
+    autoSwatch.addEventListener("click", () => this.plugin.setPreviewColorTheme("auto"));
     for (const key of COLOR_THEME_KEYS) {
       const theme = COLOR_THEMES[key];
       const swatch = this.themeSwatchContainer.createEl("button", {
@@ -149,6 +190,14 @@ class WechatPreviewView extends ItemView {
     const floatingActions = floatingBody.createDiv({
       cls: "wechat-formatter-floating-actions",
     });
+    this.headerToggleButton = floatingActions.createEl("button", {
+      cls: "wechat-formatter-hook-toggle",
+      text: "开头刊头",
+    });
+    this.headerToggleButton.addEventListener("click", () => {
+      void this.plugin.setHeaderEnabled(!this.plugin.settings.headerEnabled);
+    });
+
     this.footerToggleButton = floatingActions.createEl("button", {
       cls: "wechat-formatter-hook-toggle",
       text: "结尾钩子",
@@ -172,7 +221,9 @@ class WechatPreviewView extends ItemView {
 
     this.noteNameEl.setText(file?.basename ?? "未打开 Markdown 笔记");
     this.updateFooterToggle();
+    this.updateHeaderToggle();
     this.updateLayoutControls();
+    this.updateStyleThemePills();
     this.updateThemeSwatches();
     this.previewEl.empty();
 
@@ -207,6 +258,19 @@ class WechatPreviewView extends ItemView {
     );
   }
 
+  private updateHeaderToggle(): void {
+    if (!this.headerToggleButton) return;
+
+    const enabled = this.plugin.settings.headerEnabled;
+    this.headerToggleButton.setText(`开头刊头：${enabled ? "开" : "关"}`);
+    this.headerToggleButton.classList.toggle("is-active", enabled);
+    this.headerToggleButton.setAttribute("aria-pressed", enabled ? "true" : "false");
+    this.headerToggleButton.setAttribute(
+      "title",
+      "控制预览和复制是否包含开头刊头，样式在插件设置中选择",
+    );
+  }
+
   private updateLayoutControls(): void {
     const lineHeight = this.plugin.getPreviewLineHeight();
     const sidePadding = this.plugin.getPreviewSidePadding();
@@ -215,6 +279,21 @@ class WechatPreviewView extends ItemView {
     if (this.lineHeightValueEl) this.lineHeightValueEl.setText(lineHeight.toFixed(1));
     if (this.sidePaddingInput) this.sidePaddingInput.value = String(sidePadding);
     if (this.sidePaddingValueEl) this.sidePaddingValueEl.setText(`${sidePadding}px`);
+  }
+
+  private updateStyleThemePills(): void {
+    if (!this.styleThemePillContainer) return;
+
+    const activeStyleTheme = this.plugin.getPreviewStyleTheme();
+    for (const pill of Array.from(
+      this.styleThemePillContainer.querySelectorAll<HTMLButtonElement>(
+        ".wechat-formatter-style-pill",
+      ),
+    )) {
+      const isActive = pill.getAttribute("data-style-theme") === activeStyleTheme;
+      pill.classList.toggle("is-active", isActive);
+      pill.setAttribute("aria-pressed", isActive ? "true" : "false");
+    }
   }
 
   private updateThemeSwatches(): void {
@@ -240,7 +319,8 @@ export default class WechatFormatterPlugin extends Plugin {
   private refreshTimer: number | null = null;
   private previewLineHeight = 1.8;
   private previewSidePadding = 16;
-  private previewColorTheme: WechatColorTheme = "classic";
+  private previewColorTheme: WechatColorThemeChoice = "auto";
+  private previewStyleTheme: WechatStyleTheme = "classic";
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -319,6 +399,14 @@ export default class WechatFormatterPlugin extends Plugin {
       sidePadding: this.previewSidePadding,
       fontPreset: this.settings.defaultFontPreset,
       colorTheme: this.previewColorTheme,
+      styleTheme: this.previewStyleTheme,
+      brandText: this.settings.brandText,
+      header: {
+        enabled: this.settings.headerEnabled,
+        style: this.settings.headerStyle,
+        brandText: this.settings.brandText,
+        badgeText: this.settings.headerBadgeText,
+      },
     });
   }
 
@@ -330,12 +418,21 @@ export default class WechatFormatterPlugin extends Plugin {
     return this.previewSidePadding;
   }
 
-  getPreviewColorTheme(): WechatColorTheme {
+  getPreviewColorTheme(): WechatColorThemeChoice {
     return this.previewColorTheme;
   }
 
   setPreviewColorTheme(value: unknown): void {
-    this.previewColorTheme = normalizeColorTheme(value);
+    this.previewColorTheme = normalizeColorThemeChoice(value);
+    this.refreshViews();
+  }
+
+  getPreviewStyleTheme(): WechatStyleTheme {
+    return this.previewStyleTheme;
+  }
+
+  setPreviewStyleTheme(value: unknown): void {
+    this.previewStyleTheme = normalizeStyleTheme(value);
     this.refreshViews();
   }
 
@@ -352,7 +449,8 @@ export default class WechatFormatterPlugin extends Plugin {
   resetPreviewLayout(refresh = true): void {
     this.previewLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
     this.previewSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
-    this.previewColorTheme = normalizeColorTheme(this.settings.defaultColorTheme);
+    this.previewColorTheme = normalizeColorThemeChoice(this.settings.defaultColorTheme);
+    this.previewStyleTheme = normalizeStyleTheme(this.settings.defaultStyleTheme);
     if (refresh) this.refreshViews();
   }
 
@@ -375,9 +473,39 @@ export default class WechatFormatterPlugin extends Plugin {
   }
 
   async setDefaultColorTheme(value: unknown): Promise<void> {
-    this.settings.defaultColorTheme = normalizeColorTheme(value);
+    this.settings.defaultColorTheme = normalizeColorThemeChoice(value);
     await this.saveSettings();
     this.resetPreviewLayout();
+  }
+
+  async setDefaultStyleTheme(value: unknown): Promise<void> {
+    this.settings.defaultStyleTheme = normalizeStyleTheme(value);
+    await this.saveSettings();
+    this.resetPreviewLayout();
+  }
+
+  async setBrandText(value: string): Promise<void> {
+    this.settings.brandText = value;
+    await this.saveSettings();
+    this.refreshViews();
+  }
+
+  async setHeaderEnabled(enabled: boolean): Promise<void> {
+    this.settings.headerEnabled = enabled;
+    await this.saveSettings();
+    this.refreshViews();
+  }
+
+  async setHeaderStyle(value: unknown): Promise<void> {
+    this.settings.headerStyle = normalizeHeaderStyle(value);
+    await this.saveSettings();
+    this.refreshViews();
+  }
+
+  async setHeaderBadgeText(value: string): Promise<void> {
+    this.settings.headerBadgeText = value;
+    await this.saveSettings();
+    this.refreshViews();
   }
 
   hasFooterMarkdown(): boolean {
@@ -505,10 +633,29 @@ export default class WechatFormatterPlugin extends Plugin {
         ? (loadedData as Partial<WechatFormatterSettings>)
         : {};
     this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
+    // 0.2.x 旧设置的默认配色是 "classic"，迁移为 "auto" 让新主题使用自带色
+    if (
+      typeof loadedSettings.settingsVersion !== "number" &&
+      this.settings.defaultColorTheme === "classic"
+    ) {
+      this.settings.defaultColorTheme = "auto";
+    }
+    this.settings.settingsVersion = 2;
     this.settings.defaultLineHeight = normalizeLineHeight(this.settings.defaultLineHeight);
     this.settings.defaultSidePadding = normalizeSidePadding(this.settings.defaultSidePadding);
     this.settings.defaultFontPreset = normalizeFontPreset(this.settings.defaultFontPreset);
-    this.settings.defaultColorTheme = normalizeColorTheme(this.settings.defaultColorTheme);
+    this.settings.defaultColorTheme = normalizeColorThemeChoice(this.settings.defaultColorTheme);
+    this.settings.defaultStyleTheme = normalizeStyleTheme(this.settings.defaultStyleTheme);
+    this.settings.headerStyle = normalizeHeaderStyle(this.settings.headerStyle);
+    if (typeof this.settings.brandText !== "string") {
+      this.settings.brandText = DEFAULT_HEADER_OPTIONS.brandText;
+    }
+    if (typeof this.settings.headerBadgeText !== "string") {
+      this.settings.headerBadgeText = DEFAULT_HEADER_OPTIONS.badgeText;
+    }
+    if (typeof this.settings.headerEnabled !== "boolean") {
+      this.settings.headerEnabled = DEFAULT_HEADER_OPTIONS.enabled;
+    }
   }
 
   private async saveSettings(): Promise<void> {
