@@ -6,22 +6,20 @@
 
 [简体中文](./README.md)
 
-Shuai WeChat Formatter is an Obsidian plugin for writers who publish through WeChat Official Accounts. Open a Markdown note, click the ribbon icon, and copy clean rich text with inline styles that can be pasted directly into the WeChat editor.
+Choose a theme and color palette, adjust typography and spacing, add an opening header and closing hook, then preview in Obsidian and copy rich text into the WeChat Official Account editor.
 
 All formatting happens locally. The plugin does not upload notes, send network requests, collect analytics, or save copies of article content.
 
-The plugin keeps the workflow simple: write in Markdown, preview the result, then copy rich text into WeChat.
-
 ## Features
 
+- Choose from four layout themes: Classic, Minimal, Bold, and Magazine, with selectable accent colors.
+- Add an optional opening header with brand text and a badge, plus a Markdown closing hook.
+- Choose a body font and adjust line height and page margins.
 - Copy the active Markdown note as both `text/html` and `text/plain`.
 - Preview the WeChat layout in a split pane or a new tab.
 - Refresh the preview automatically while editing.
-- Add an optional Markdown footer for communities, products, contact details, or advertisements.
-- Toggle the footer directly from the floating preview controls.
-- Adjust line height and page margins before copying.
-- Save default line height and page margin values in plugin settings.
-- Choose a body font in plugin settings: editor default, sans-serif, or serif. Code remains monospaced.
+- Toggle the opening header and closing hook directly from the preview controls.
+- Save default layout choices in plugin settings; code remains monospaced.
 - Convert Markdown links into numbered references at the end of the article.
 - Ignore YAML frontmatter at the beginning of a note.
 - Escape raw HTML and sanitize generated preview content.
@@ -44,6 +42,8 @@ The plugin keeps the workflow simple: write in Markdown, preview the result, the
 ## Installation
 
 Install it from **Settings → Community plugins → Browse** by searching for **Shuai WeChat Formatter**.
+
+[View the Obsidian community plugin page](https://community.obsidian.md/plugins/shuai-wechat-formatter).
 
 For manual installation, download `main.js`, `manifest.json`, and `styles.css` from the latest GitHub release and place them in:
 
@@ -73,9 +73,11 @@ npm run build
 
 Use the **复制公众号格式** button at the top of the preview to copy the latest version again.
 
-## Footer content
+## Opening header and closing hook
 
-Open **Settings → Shuai WeChat Formatter** and enter Markdown footer content. For example:
+Open **Settings → Shuai WeChat Formatter** to choose an opening header style, brand text, and badge. The header can be toggled in the preview.
+
+Add Markdown for a closing hook, such as a community, product, or contact link. For example:
 
 ```markdown
 ### Join the community
@@ -83,7 +85,7 @@ Open **Settings → Shuai WeChat Formatter** and enter Markdown footer content. 
 Find more Obsidian and AI writing resources at <https://example.com>.
 ```
 
-When enabled, the plugin inserts a visible horizontal rule before the footer. The floating controls in the lower-left corner of the preview can temporarily enable or disable the footer for both preview and copy output.
+When enabled, the plugin inserts a visible separator before the closing hook. The preview controls can temporarily enable or disable it for both preview and copy output.
 
 ## Preview and layout controls
 
@@ -92,7 +94,7 @@ Choose how the preview opens in the plugin settings:
 - **Right split** opens the preview next to the current note.
 - **New tab** opens the preview in the current tab group.
 
-The floating preview panel provides two controls:
+The floating preview panel lets you choose a theme and color palette, toggle the opening header and closing hook, and adjust:
 
 - **Line height** ranges from `1.2` to `2.5`.
 - **Page margin** ranges from `0` to `48px`.
