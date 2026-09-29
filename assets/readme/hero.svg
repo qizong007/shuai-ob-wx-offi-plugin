@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
   <title id="title">Shuai WeChat Formatter</title>
-  <desc id="desc">Obsidian 微信公众号排版助手：主题配色、开头刊头、结尾钩子、实时预览和一键复制。</desc>
+  <desc id="desc">在 Obsidian 写完，一键复制，直接粘贴到微信公众号，保留排版。</desc>
   <rect width="1200" height="360" rx="26" fill="#17171E"/>
   <rect x="1" y="1" width="1198" height="358" rx="25" fill="none" stroke="#393943"/>
 
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
     <text x="64" y="57" fill="#53CFA1" font-size="17" font-weight="600" letter-spacing="2">OBSIDIAN 社区插件</text>
-    <text x="64" y="132" fill="#FAF9FC" font-size="55" font-weight="750">微信公众号排版助手</text>
+    <text x="64" y="132" fill="#FAF9FC" font-size="48" font-weight="750">一键复制，粘贴到公众号</text>
     <text x="67" y="168" fill="#53CFA1" font-size="16" font-weight="700" letter-spacing="3">SHUAI WECHAT FORMATTER</text>
-    <text x="64" y="221" fill="#D0D0D7" font-size="21">选主题配色，调字体、行距和页边距，</text>
-    <text x="64" y="252" fill="#D0D0D7" font-size="21">添加刊头与结尾钩子，预览后一键复制。</text>
+    <text x="64" y="221" fill="#D0D0D7" font-size="21">在 Obsidian 写完，一键复制公众号富文本，</text>
+    <text x="64" y="252" fill="#D0D0D7" font-size="21">到公众号编辑器直接粘贴，保留排版。</text>
     <g fill="#E9E8EE" font-size="17">
       <circle cx="70" cy="294" r="5" fill="#53CFA1"/><text x="85" y="300">主题风格</text>
       <circle cx="217" cy="294" r="5" fill="#53CFA1"/><text x="232" y="300">开头刊头</text>

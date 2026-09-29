@@ -6,16 +6,24 @@
 
 [简体中文](./README.md)
 
-Choose a theme and color palette, adjust typography and spacing, add an opening header and closing hook, then preview in Obsidian and copy rich text into the WeChat Official Account editor.
+**Write in Obsidian, copy with one click, and paste into the WeChat Official Account editor with your formatting preserved.**
+
+Choose a theme and color palette, adjust typography and spacing, and add an opening header and closing hook with a live preview.
 
 All formatting happens locally. The plugin does not upload notes, send network requests, collect analytics, or save copies of article content.
 
+## Video walkthrough
+
+[![Bilibili video: building and publishing this Obsidian plugin with Codex](./assets/readme/bilibili-video-preview.jpg)](https://www.bilibili.com/video/BV1NRhs6hEQU/)
+
+[▶ Watch on Bilibili: building and publishing this Obsidian plugin with Codex (Chinese)](https://www.bilibili.com/video/BV1NRhs6hEQU/)
+
 ## Features
 
+- **One-click copy, then paste**: copy your Markdown note as WeChat-ready rich text with the formatting shown in the preview.
 - Choose from four layout themes: Classic, Minimal, Bold, and Magazine, with selectable accent colors.
 - Add an optional opening header with brand text and a badge, plus a Markdown closing hook.
 - Choose a body font and adjust line height and page margins.
-- Copy the active Markdown note as both `text/html` and `text/plain`.
 - Preview the WeChat layout in a split pane or a new tab.
 - Refresh the preview automatically while editing.
 - Toggle the opening header and closing hook directly from the preview controls.
@@ -177,6 +185,24 @@ For local images, one option is [Image Auto Upload Plugin](https://github.com/re
 - Remote image handling still depends on the WeChat editor and its media policies.
 - Mobile behavior has not been fully tested on physical devices.
 - WeChat may filter additional HTML or styles, so review the pasted article before publishing.
+
+## User feedback
+
+> “I installed it — it's very convenient.”
+
+Translated from a user's feedback after installation. Original conversation in Chinese:
+
+<p align="center">
+  <img src="./assets/readme/user-feedback.jpg" width="420" alt="User feedback in Chinese: the plugin is convenient after installation; the conversation discusses copying from Obsidian and pasting into WeChat">
+</p>
+
+## Contact the author
+
+I'm Wang Shuaizhen (王帅真). Scan the QR code to add me on WeChat and share your experience, report issues, or suggest improvements.
+
+<p align="center">
+  <img src="./assets/readme/author-wechat.jpg" width="320" alt="Wang Shuaizhen's WeChat QR code — scan to add the author">
+</p>
 
 ## Support the author
 
