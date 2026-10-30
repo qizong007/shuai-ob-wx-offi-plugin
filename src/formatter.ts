@@ -31,7 +31,7 @@ export interface WechatColorThemeDefinition {
   palette: WechatColorPalette;
 }
 
-export type WechatStyleTheme = "classic" | "minimal" | "trend" | "magazine";
+export type WechatStyleTheme = "classic" | "minimal" | "trend" | "magazine" | "shuai";
 
 interface TableCellFlags {
   header: boolean;
@@ -61,7 +61,7 @@ interface WechatThemeHooks {
 export interface WechatStyleThemeDefinition {
   label: string;
   description: string;
-  /** 非经典主题的固定配色；也用于链接角标、引用源等共享模板 */
+  /** 主题默认配色；也用于链接角标、引用源等共享模板 */
   palette: WechatColorPalette;
   hooks: Partial<WechatThemeHooks>;
 }
@@ -358,8 +358,8 @@ const createClassicHooks = (): WechatThemeHooks => ({
 
 const classicHooks = createClassicHooks();
 
-/** 杂志主题二级标题的自动编号，每次渲染前重置 */
-let magazineSectionNumber = 0;
+/** 杂志与 shuai 主题二级标题的自动编号，每次渲染前重置 */
+let sectionNumber = 0;
 
 /** 杂志主题二级标题上方的品牌小字，每次渲染前从布局选项读取 */
 let activeBrandText = "";
@@ -501,8 +501,8 @@ export const STYLE_THEMES: Record<WechatStyleTheme, WechatStyleThemeDefinition> 
           case 1:
             return `<h1 style="color: #1a1a1a; font-size: 26px; font-weight: 900; line-height: 1.35; letter-spacing: -0.5px; margin: 38px 0 20px; padding-top: 16px; border-top: 3px solid ${activePalette.accent};">${wrapInlineContent(text)}</h1>`;
           case 2: {
-            magazineSectionNumber += 1;
-            const number = String(magazineSectionNumber).padStart(2, "0");
+            sectionNumber += 1;
+            const number = String(sectionNumber).padStart(2, "0");
             const kicker = activeBrandText
               ? `<section style="margin-bottom: 4px;"><span style="font-size: 9px; color: ${activePalette.accent}; letter-spacing: 3px; font-weight: 800;">${escapeHtml(activeBrandText)}</span></section>`
               : "";
@@ -555,6 +555,61 @@ export const STYLE_THEMES: Record<WechatStyleTheme, WechatStyleThemeDefinition> 
           ? `padding: 10px 12px; font-size: 13px; font-weight: 700; color: #ffffff; background: ${activePalette.accent}; text-align: left; letter-spacing: 0.5px;`
           : "padding: 10px 12px; font-size: 13.5px; color: #3a3a3a; line-height: 1.7; border-bottom: 1px solid #e5e5e5; vertical-align: top;";
         return `<${type} style="${style}">${content}</${type}>`;
+      },
+    },
+  },
+  shuai: {
+    label: "shuai",
+    description: "黑白排版、衬线标题与朱砂红点缀，细线留白，延续帅真的个人网站风格。",
+    palette: {
+      headingBackground: "#242222",
+      headingColor: "#242222",
+      accent: "#b73832",
+      strongColor: "#242222",
+      blockquoteBackground: "#faf9f6",
+      codeColor: "#b73832",
+      codeBackground: "#f5f3f0",
+      tableHeaderBackground: "#faf9f6",
+      hrColor: "#e2ddd8",
+    },
+    hooks: {
+      heading: (text, level) => {
+        const font = "'Source Serif 4', 'Noto Serif SC', 'Songti SC', 'STSong', 'Times New Roman', serif";
+        const base = `color: #242222; font-family: ${font}; font-weight: 700; line-height: 1.45;`;
+        switch (level) {
+          case 1:
+            return `<h1 style="${base} font-size: 28px; letter-spacing: -0.5px; margin: 38px 0 24px;">${wrapInlineContent(text)}<span style="color: ${activePalette.accent}; font-size: 22px; margin-left: 8px;">.</span></h1>`;
+          case 2: {
+            sectionNumber += 1;
+            const number = String(sectionNumber).padStart(2, "0");
+            return `<h2 style="${base} font-size: 21px; margin: 36px 0 18px; padding-bottom: 12px; border-bottom: 1px solid ${activePalette.accent};"><span style="color: ${activePalette.accent}; font-size: 21px; margin-right: 10px;">${number}</span>${wrapInlineContent(text)}</h2>`;
+          }
+          default:
+            return `<h${level} style="${base} font-size: ${level === 3 ? 18 : 20 - level}px; margin: 26px 0 12px;">${wrapInlineContent(text)}</h${level}>`;
+        }
+      },
+      paragraph: (text) =>
+        `<p style="color: #242222; font-size: 16px; line-height: ${activeLineHeight}; margin: 18px 0; letter-spacing: 0.01em;">${wrapInlineContent(text)}</p>`,
+      strong: (text) => `<strong style="color: #242222; font-weight: 700;">${text}</strong>`,
+      em: (text) => `<em style="color: #575250; font-style: italic;">${text}</em>`,
+      blockquote: (quote) =>
+        `<blockquote style="background: ${activePalette.blockquoteBackground}; border-left: 2px solid ${activePalette.accent}; margin: 24px 0; padding: 2px 18px; color: #575250;">${quote}</blockquote>`,
+      code: (code) =>
+        `<pre style="background: ${activePalette.codeBackground}; border: 1px solid #e2ddd8; padding: 16px; margin: 20px 0; overflow-x: auto; font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 14px; line-height: 1.6; color: #242222; white-space: pre-wrap;"><code>${escapeHtml(code)}</code></pre>`,
+      listitem: (text) =>
+        `<li style="color: #242222; font-size: 16px; line-height: ${activeLineHeight}; margin: 8px 0;">${wrapInlineContent(text)}</li>`,
+      image: (url, titleAttribute, altAttribute) =>
+        `<img src="${url}"${titleAttribute}${altAttribute} style="display: block; max-width: 100%; height: auto; margin: 24px auto;">`,
+      hr: (margin) =>
+        `<hr style="border: none; border-top: 1px solid ${activePalette.hrColor}; margin: ${margin};">`,
+      table: (header, body) =>
+        `<table style="width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 14px; color: #242222; border-top: 1px solid #242222; border-bottom: 1px solid #242222;"><thead>${header}</thead><tbody>${body}</tbody></table>`,
+      tablecell: (content, flags) => {
+        const type = flags.header ? "th" : "td";
+        const headerStyle = flags.header
+          ? `background: ${activePalette.tableHeaderBackground}; font-weight: 700;`
+          : "";
+        return `<${type} style="padding: 10px 12px; text-align: ${flags.align ?? "left"}; line-height: ${activeLineHeight}; border-bottom: 1px solid #e2ddd8; ${headerStyle}">${content}</${type}>`;
       },
     },
   },
@@ -686,7 +741,7 @@ export const formatMarkdownForWechat = (
   linkReferences.length = 0;
   linkReferenceNumbers.clear();
   footerSeparatorPending = false;
-  magazineSectionNumber = 0;
+  sectionNumber = 0;
   activeBrandText =
     typeof layout.brandText === "string" ? layout.brandText.trim() : DEFAULT_BRAND_TEXT;
   const styleTheme = normalizeStyleTheme(layout.styleTheme);

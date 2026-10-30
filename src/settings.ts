@@ -101,7 +101,7 @@ export class WechatFormatterSettingTab extends PluginSettingTab {
 
     new Setting(typographySection)
       .setName("主题风格")
-      .setDesc("整套排版风格：经典支持自由配色；极简、新锐、杂志为固定视觉设计。")
+      .setDesc("经典、极简、新锐、杂志、shuai 五套排版风格；配色选择“跟随主题”可使用各自的默认颜色。")
       .addDropdown((dropdown) => {
         for (const key of STYLE_THEME_KEYS) {
           dropdown.addOption(key, `${STYLE_THEMES[key].label} — ${STYLE_THEMES[key].description}`);

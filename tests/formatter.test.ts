@@ -282,7 +282,7 @@ test("falls back to the classic style theme for unknown values", () => {
   assert.match(html, /background-color: #4a4a4a/);
   assert.equal(normalizeStyleTheme("unexpected"), "classic");
   assert.equal(normalizeStyleTheme("magazine"), "magazine");
-  assert.deepEqual(STYLE_THEME_KEYS, ["classic", "minimal", "trend", "magazine"]);
+  assert.deepEqual(STYLE_THEME_KEYS, ["classic", "minimal", "trend", "magazine", "shuai"]);
   for (const key of STYLE_THEME_KEYS) {
     assert.ok(STYLE_THEMES[key].label.length > 0);
     assert.ok(STYLE_THEMES[key].description.length > 0);
