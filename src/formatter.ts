@@ -538,7 +538,7 @@ export const STYLE_THEMES: Record<WechatStyleTheme, WechatStyleThemeDefinition> 
       listitem: (text) =>
         `<li style="color: #3a3a3a; font-size: 15px; line-height: ${activeLineHeight}; margin: 8px 0;">${wrapInlineContent(text)}</li>`,
       image: (url, titleAttribute, altAttribute) =>
-        `<img src="${url}"${titleAttribute}${altAttribute} style="display: block; box-sizing: border-box; max-width: 100%; height: auto; margin: 18px auto; border: 2px solid ${activePalette.accent}; border-radius: 16px;">`,
+        `<img src="${url}"${titleAttribute}${altAttribute} style="display: block; max-width: 100%; height: auto; margin: 18px auto; border-radius: 16px;">`,
       hr: (margin) =>
         `<hr style="border: none; height: 4px; border-top: 1px solid ${activePalette.accent}; border-bottom: 1px solid #e5e5e5; margin: ${margin};">`,
       table: (header, body) => {
